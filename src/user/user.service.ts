@@ -4,7 +4,7 @@ import { UpdateUser,CreateUser } from './dto';
 import { DeepPartial, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WebsocketsGateway } from 'src/socket/gateway';
-import { UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
+import { UpdateAvailableDaysDto, UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -63,16 +63,16 @@ export class UserService {
         return this.userRepository.findOneBy({ huella:huella});
       }
 
-      async update({ id, name, actived, img }: UpdateUser) {
+    async update({ id, name, actived, img }: UpdateUser) {
         const user = await this.userRepository.findOneBy({id:id});
-        if (!user) {
-            throw new Error(`User with ID ${id} not found`);
-        }
-        console.log("llega a actualizar");    user.name = name;
-        user.actived = actived;
-        user.img = img;
-    
-        return await this.userRepository.save(user);
+          if (!user) {
+              throw new Error(`User with ID ${id} not found`);
+          }
+          console.log("llega a actualizar");    user.name = name;
+          user.actived = actived;
+          user.img = img;
+      
+          return await this.userRepository.save(user);
     }
 
 
@@ -112,4 +112,19 @@ export class UserService {
     return     true
 }
 
+
+
+async updateAvailableDays({ id, available_days }: UpdateAvailableDaysDto): Promise<User> {
+  // Buscamos el usuario por ID
+  const user = await this.userRepository.findOneBy({ id });
+  if (!user) {
+    throw new NotFoundException(`User with ID ${id} not found`);
+  }
+
+  // Actualizamos el campo disponible
+  user.available_days = user.available_days+available_days;
+
+  // Guardamos los cambios y retornamos el usuario actualizado
+  return this.userRepository.save(user);
+}
 }
