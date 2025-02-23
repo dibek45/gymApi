@@ -1,0 +1,119 @@
+version: "3.5"
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres  # ✅ Ahora la DB se llama 'postgres'
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - shared-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-docker-postgres
+    restart: always
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # ✅ Conectado a 'postgres'
+      - AUTH_SERVICE_HOST=auth-service2 
+      - AUTH_SERVICE_PORT=4001
+      - AUTH_MEMBER_HOST=authmember2
+      - AUTH_MEMBER_PORT=4002
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      auth-service2:
+        condition: service_healthy
+      authmember2:
+        condition: service_healthy
+    networks:
+      - shared-network
+    volumes:
+      - ./src:/app/src
+      - ./uploads:/app/uploads
+      - ./node_modules:/app/node_modules
+
+  auth-service2:
+    build:
+      context: ../auth-service2
+      dockerfile: Dockerfile
+    container_name: auth-service2
+    restart: always
+    environment:
+      - PORT=4001
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # ✅ Conectado a 'postgres'
+    ports:
+      - "4001:4001"
+    networks:
+      - shared-network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "sh", "-c", "sleep 5 && nc -z 127.0.0.1 4001 || exit 1"]
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 60s
+
+  authmember2:
+    build:
+      context: ../authmember2
+      dockerfile: Dockerfile
+    container_name: authmember2
+    restart: always
+    environment:
+      - PORT=4002
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # ✅ Conectado a 'postgres'
+    ports:
+      - "4002:4002"
+    networks:
+      - shared-network
+    volumes:
+      - ../authmember2/src:/app/src
+      - ../authmember2/node_modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "sh", "-c", "sleep 5 && nc -z 127.0.0.1 4002 || exit 1"]
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 60s
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: nest-pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=david-6393@hotmail.com
+      - PGADMIN_DEFAULT_PASSWORD=Dandroid*1
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    driver: bridge
