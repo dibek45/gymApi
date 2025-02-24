@@ -1,6 +1,5 @@
-// src/point-of-sale/dto/cart-item.input.ts
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, IsOptional, IsBoolean, IsInt } from 'class-validator';
 
 @InputType()
 export class CartItemInput {
@@ -11,15 +10,25 @@ export class CartItemInput {
   quantity: number;
 
   @Field(() => String)
-    @IsString()
-    @MaxLength(20)
-    name: string;
+  @IsString()
+  @MaxLength(20)
+  name: string;
 
-    @Field(() => Int)
-    costo: number;
+  @Field(() => Int)
+  costo: number;
+
+  // ✅ Optional field to indicate if this is a membership item
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isMembership?: boolean;
+
+  // ✅ Optional field to store the client ID associated with the membership
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  idClienteTOMembership?: number;
 }
-
-
 
 
 export interface CartItemModel {

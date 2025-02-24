@@ -14,11 +14,13 @@ import { CashRegister } from './entities/cash-register.entity';
 import { CashRegisterService } from './services/cash-register.service';
 import { CashRegisterResolver } from './resolvers/cash-register.resolver';
 import { Cashier } from './cashiers/entities/cashier.entity';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Sale, CashMovement, PettyCash,Product, CashRegister,Cashier]), // Registrar entidades específicas del módulo
     GymModule, // Importar el módulo de Gym para acceder al repositorio de Gym
+    UserModule
   ],
   providers: [
     SaleService,
