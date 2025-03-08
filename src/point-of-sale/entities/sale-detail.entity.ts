@@ -1,5 +1,5 @@
 // src/point-of-sale/entities/sale-detail.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Field, Int, ObjectType, Float } from '@nestjs/graphql';
 import { Sale } from './sale.entity';
 import { Product } from 'src/product/product.entity';
@@ -12,11 +12,14 @@ export class SaleDetail {
   id: number;
 
   @ManyToOne(() => Sale, (sale) => sale.details, { onDelete: 'CASCADE' })
+  @Field(() => Sale) 
   sale: Sale;
 
-  @ManyToOne(() => Product, { eager: true })
-  @Field(() => Product)
-  product: Product;
+  @ManyToOne(() => Product, { nullable: true, eager: true }) 
+  @JoinColumn({ name: "productId" }) 
+  @Field(() => Product, { nullable: true }) 
+  product: Product | null;
+  
 
   @Column('int')
   @Field(() => Int)
@@ -30,4 +33,11 @@ export class SaleDetail {
   @Field(() => Float)
   totalPrice: number;
   
+  @Column({ type: "varchar", nullable: true }) 
+  @Field({ nullable: true }) // ✅ Hacer accesible en GraphQL
+  membershipName?: string;
+
+  @Column({ type: "boolean", default: false }) 
+  @Field(() => Boolean) // ✅ Saber si es una membresía o un producto
+  isMembership: boolean;
 }

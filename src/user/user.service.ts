@@ -113,18 +113,21 @@ export class UserService {
 }
 
 
+async updateAvailableDays(updateData: { id: number, available_days: number }) {
+  console.log(`📌 Actualizando días disponibles para userId=${updateData.id} con ${updateData.available_days} días.`);
 
-async updateAvailableDays({ id, available_days }: UpdateAvailableDaysDto): Promise<User> {
-  // Buscamos el usuario por ID
-  const user = await this.userRepository.findOneBy({ id });
-  if (!user) {
-    throw new NotFoundException(`User with ID ${id} not found`);
+  if (!updateData.id || updateData.available_days == null) {
+      console.warn(`⚠️ Datos inválidos para actualizar días disponibles:`, updateData);
+      return;
   }
 
-  // Actualizamos el campo disponible
-  user.available_days = user.available_days+available_days;
+  const result = await this.userRepository.createQueryBuilder()
+      .update(User)
+      .set({ available_days: () => `available_days + ${updateData.available_days}` })  // ✅ Usar el nombre correcto del campo
+      .where("id = :id", { id: updateData.id })
+      .execute();
 
-  // Guardamos los cambios y retornamos el usuario actualizado
-  return this.userRepository.save(user);
+  console.log(`✅ updateAvailableDays ejecutado, filas afectadas: ${result.affected}`);
 }
+
 }

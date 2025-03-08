@@ -51,7 +51,9 @@ export class Sale {
   gym: Gym;
 
 
-
+  @Column({ nullable: false }) // Asegura que el campo no sea nulo si siempre debe tener un valor
+  @Field(() => Int) // Expón en GraphQL
+  cashRegisterId: number;
 
   @ManyToOne(() => CashRegister, (cashRegister) => cashRegister.sales, { nullable: true, eager: true })
   @JoinColumn({ name: 'cashRegisterId' }) // Clave foránea en la base de datos

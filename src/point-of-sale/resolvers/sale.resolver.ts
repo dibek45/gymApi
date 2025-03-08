@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { SaleService } from '../services/sale.service';
 import { Sale } from '../entities/sale.entity';
 import { CartItemInput } from '../dto/cart-item.input';
@@ -14,12 +14,15 @@ export class SaleResolver {
 
   @Mutation(() => Sale)
   async createSale(
-    @Args('gymId') gymId: number,
+    @Args('gymId', { type: () => Int }) gymId: number, // 🔥 Asegurar que sea Int
     @Args('paymentMethod') paymentMethod: string,
-    @Args('cart', { type: () => [CartItemInput] }) cart: CartItemInput[], // Nuevo argumento para el carrito
+    @Args('cart', { type: () => [CartItemInput] }) cart: CartItemInput[],
+    @Args('cashRegisterId', { type: () => Int }) cashRegisterId: number // 🔥 También Int
   ): Promise<Sale> {
-    return this.saleService.createSale(gymId, paymentMethod, cart);
+    console.log(`🛠️ Recibiendo en GraphQL -> gymId: ${gymId}, cashRegisterId: ${cashRegisterId}`);
+    return this.saleService.createSale(gymId, paymentMethod, cart, cashRegisterId);
   }
+  
   
 
 

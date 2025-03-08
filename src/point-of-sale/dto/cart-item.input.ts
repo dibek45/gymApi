@@ -28,7 +28,14 @@ export class CartItemInput {
   @IsOptional()
   @IsInt()
   idClienteTOMembership?: number;
+
+    // ✅ Optional field to store the client ID associated with the membership
+    @Field(() => Int, { nullable: true })
+    @IsOptional()
+    @IsInt()
+    cashRegisterId?: number;
 }
+
 
 
 export interface CartItemModel {
