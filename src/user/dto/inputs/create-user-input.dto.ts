@@ -24,6 +24,10 @@ export class CreateUser {
   img: string;
 
   @Field()
+  @IsString()
+  username: string;
+
+  @Field()
   @IsNumber()
   @IsNotEmpty()
   gymId: number;

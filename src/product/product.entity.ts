@@ -49,6 +49,11 @@ export class Product {
   @Column({ type: 'varchar', length: 50, nullable: true }) // 🆕 Nueva columna barcode
   @Field({ nullable: true })
   barcode?: string;
+
+   // 🔥 New boolean field to mark a product as a membership
+   @Column({ type: 'boolean', default: false })
+   @Field(() => Boolean, { nullable: true })
+   isMembership?: boolean;
 }
 
 

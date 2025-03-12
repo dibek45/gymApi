@@ -51,3 +51,20 @@ export class UpdateFingerPrintUserByID{
     @IsString()
     huella: string;
 }
+
+
+// update-available-days.dto.ts
+
+
+@InputType()
+export class UpdateAvailableDaysDto {
+  @Field(() => Int) // Decorador para exponer el tipo en el esquema GraphQL
+  @IsNumber()       // Decoradores de validación
+  @IsNotEmpty()
+  id: number;
+
+  @Field(() => Int)
+  @IsNumber()
+  @IsNotEmpty()
+  available_days: number;
+}

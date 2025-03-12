@@ -13,6 +13,8 @@ import { WebsocketsGateway } from 'src/socket/gateway';
  imports:[
   TypeOrmModule.forFeature([User]),
 
- ]
+ ],
+ exports: [UserService],
+
 })
 export class UserModule {}

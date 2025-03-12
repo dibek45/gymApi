@@ -4,7 +4,7 @@ import { UpdateUser,CreateUser } from './dto';
 import { DeepPartial, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WebsocketsGateway } from 'src/socket/gateway';
-import { UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
+import { UpdateAvailableDaysDto, UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -21,20 +21,34 @@ export class UserService {
     }
     
     async create(data: CreateUser): Promise<User> {
+      // ✅ Verificamos si el username ya existe
+      const existingUser = await this.userRepository.findOne({
+        where: { username: data.username }
+      });
+    
+      if (existingUser) {
+        console.log(`⚠️ Usuario con username "${data.username}" ya existe. No se creará otro.`);
+        throw new Error(`El username "${data.username}" ya está en uso.`);
+      }
+    
       const newUser = new User();
-     
+      
       newUser.name = data.name;
       newUser.actived = data.actived;
       newUser.huella = data.huella; 
       newUser.img = data.img; 
-      newUser.gymId=data.gymId;
-      newUser.available_days=666;
+      newUser.gymId = data.gymId;
+      newUser.available_days = 666;
+    
+      // 👇 Esto es clave, el username debe venir de "data"
+      newUser.username = data.username;
+    
       const user = await this.userRepository.save(newUser);
-      console.log(user.gymId)
+      console.log('✅ Usuario creado con gymId:', user.gymId);
+    
       return user;
     }
     
-
     async findAll(): Promise<User[]> {
       return await this.userRepository.find();
       }
@@ -63,16 +77,16 @@ export class UserService {
         return this.userRepository.findOneBy({ huella:huella});
       }
 
-      async update({ id, name, actived, img }: UpdateUser) {
+    async update({ id, name, actived, img }: UpdateUser) {
         const user = await this.userRepository.findOneBy({id:id});
-        if (!user) {
-            throw new Error(`User with ID ${id} not found`);
-        }
-        console.log("llega a actualizar");    user.name = name;
-        user.actived = actived;
-        user.img = img;
-    
-        return await this.userRepository.save(user);
+          if (!user) {
+              throw new Error(`User with ID ${id} not found`);
+          }
+          console.log("llega a actualizar");    user.name = name;
+          user.actived = actived;
+          user.img = img;
+      
+          return await this.userRepository.save(user);
     }
 
 
@@ -110,6 +124,24 @@ export class UserService {
 
      await this.userRepository.delete({id:user.id});
     return     true
+}
+
+
+async updateAvailableDays(updateData: { id: number, available_days: number }) {
+  console.log(`📌 Actualizando días disponibles para userId=${updateData.id} con ${updateData.available_days} días.`);
+
+  if (!updateData.id || updateData.available_days == null) {
+      console.warn(`⚠️ Datos inválidos para actualizar días disponibles:`, updateData);
+      return;
+  }
+
+  const result = await this.userRepository.createQueryBuilder()
+      .update(User)
+      .set({ available_days: () => `available_days + ${updateData.available_days}` })  // ✅ Usar el nombre correcto del campo
+      .where("id = :id", { id: updateData.id })
+      .execute();
+
+  console.log(`✅ updateAvailableDays ejecutado, filas afectadas: ${result.affected}`);
 }
 
 }

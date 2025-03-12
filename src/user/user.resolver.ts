@@ -6,7 +6,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { Get } from '@nestjs/common';
 import { Observable, interval, map } from 'rxjs';
 import { WebsocketsGateway } from 'src/socket/gateway';
-import { UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
+import { UpdateAvailableDaysDto, UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
 
 const pubSub = new PubSub();
 
@@ -106,7 +106,17 @@ export class UserResolver {
 
 
     @Subscription(() => User)
-  newUser() {
+    newUser() {
     return pubSub.asyncIterator('newUser'); // Maneja la suscripción para el evento newUser
   }
+
+
+
+  @Mutation(() => User, { name: 'updateAvailableDays' })
+  updateAvailableDays(
+    @Args('updateAvailableDaysInput') updateAvailableDaysInput: UpdateAvailableDaysDto,
+  ) {
+    return this._user.updateAvailableDays(updateAvailableDaysInput);
+  }
+  
 }
