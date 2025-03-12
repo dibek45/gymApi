@@ -21,20 +21,34 @@ export class UserService {
     }
     
     async create(data: CreateUser): Promise<User> {
+      // ✅ Verificamos si el username ya existe
+      const existingUser = await this.userRepository.findOne({
+        where: { username: data.username }
+      });
+    
+      if (existingUser) {
+        console.log(`⚠️ Usuario con username "${data.username}" ya existe. No se creará otro.`);
+        throw new Error(`El username "${data.username}" ya está en uso.`);
+      }
+    
       const newUser = new User();
-     
+      
       newUser.name = data.name;
       newUser.actived = data.actived;
       newUser.huella = data.huella; 
       newUser.img = data.img; 
-      newUser.gymId=data.gymId;
-      newUser.available_days=666;
+      newUser.gymId = data.gymId;
+      newUser.available_days = 666;
+    
+      // 👇 Esto es clave, el username debe venir de "data"
+      newUser.username = data.username;
+    
       const user = await this.userRepository.save(newUser);
-      console.log(user.gymId)
+      console.log('✅ Usuario creado con gymId:', user.gymId);
+    
       return user;
     }
     
-
     async findAll(): Promise<User[]> {
       return await this.userRepository.find();
       }
