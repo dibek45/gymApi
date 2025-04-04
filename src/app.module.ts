@@ -24,6 +24,7 @@ import { RoutineModule } from './routines/routines.module';
 import { RolesModule } from './rol/rol.module';
 import { AuthModule } from './auth/auth.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MachineModule } from './machine/machine.module';
 
 @Module({
   imports: 
@@ -58,7 +59,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
               password: 'postgres',
               database: 'postgres',
               entities: ['dist/**/*.entity.{ts,js}'],
-              synchronize: true, 
+              synchronize: false, 
               migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
               autoLoadEntities: true,
             }),
@@ -68,7 +69,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             PointOfSaleModule,
             PromotionModule,
             RoutineModule,
-            RolesModule
+            RolesModule,
+            MachineModule 
             
           ],
   controllers: [AppController],

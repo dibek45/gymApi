@@ -1,4 +1,5 @@
-version: "3.5"
+
+version: "3.8"
 
 services:
   db:
@@ -8,7 +9,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres  # ✅ Ahora la DB se llama 'postgres'
+      - POSTGRES_DB=postgres
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
@@ -29,13 +30,13 @@ services:
     restart: always
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # ✅ Conectado a 'postgres'
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
       - AUTH_SERVICE_HOST=auth-service2 
       - AUTH_SERVICE_PORT=4001
       - AUTH_MEMBER_HOST=authmember2
       - AUTH_MEMBER_PORT=4002
     ports:
-      - "3000:3000"
+      - "3000:3000"  # 👈 Puerto 3100 en tu máquina, 3000 dentro del contenedor
     depends_on:
       db:
         condition: service_healthy
@@ -58,7 +59,7 @@ services:
     restart: always
     environment:
       - PORT=4001
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # ✅ Conectado a 'postgres'
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     ports:
       - "4001:4001"
     networks:
@@ -81,7 +82,7 @@ services:
     restart: always
     environment:
       - PORT=4002
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # ✅ Conectado a 'postgres'
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     ports:
       - "4002:4002"
     networks:
@@ -111,6 +112,22 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - shared-network
+
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ../caddy/data:/data
+      - ../caddy/config:/config
+    depends_on:
+      - app
     networks:
       - shared-network
 

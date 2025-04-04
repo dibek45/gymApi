@@ -18,11 +18,11 @@ export class Gym {
   id: number;
 
   @Column()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   name: string;
 
   @Column()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   location: string;
 
 

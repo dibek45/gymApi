@@ -22,11 +22,32 @@ async function bootstrap() {
   // 🔹 Increase request body size limit
   app.use(bodyParser.json({ limit: '50mb' }));
 
-  // 🔹 Enable CORS
+  const isProd = process.env.NODE_ENV === 'production';
+  const whitelist = [
+    'https://api.dibeksolutions.com',
+    'https://localhost',
+    'capacitor://localhost',
+    'http://localhost:3000',
+    'http://127.0.0.1:4200',
+    'http://192.168.1.75:3000',
+  ];
+  
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      // Si no hay origin (por ejemplo, una llamada desde CURL), lo permitimos
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`❌ Blocked by CORS: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
+  
+  
 
   // 🔹 GraphQL Upload Middleware (if using file uploads)
 //  app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
