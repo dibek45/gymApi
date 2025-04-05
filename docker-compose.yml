@@ -130,6 +130,14 @@ services:
       - app
     networks:
       - shared-network
+  frontend:
+    image: nginx:alpine
+    container_name: angular-frontend
+    restart: always
+    volumes:
+      - ../../frontend/dist:/usr/share/nginx/html
+    networks:
+      - shared-network
 
 networks:
   shared-network:
