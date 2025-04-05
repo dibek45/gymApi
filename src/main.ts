@@ -25,6 +25,7 @@ async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
   const whitelist = [
     'https://api.dibeksolutions.com',
+    'https://app.dibeksolutions.com',
     'https://localhost',
     'capacitor://localhost',
     'http://localhost:3000',
