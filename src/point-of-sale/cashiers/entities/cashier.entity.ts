@@ -1,5 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { CashRegister } from 'src/point-of-sale/entities/cash-register.entity';
+import { CashRegister } from '../../entities/cash-register.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()

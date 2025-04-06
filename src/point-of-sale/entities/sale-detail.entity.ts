@@ -2,7 +2,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Field, Int, ObjectType, Float } from '@nestjs/graphql';
 import { Sale } from './sale.entity';
-import { Product } from 'src/product/product.entity';
+import { Product } from './../../product/product.entity';
 
 @Entity()
 @ObjectType()

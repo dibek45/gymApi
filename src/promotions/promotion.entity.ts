@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
-import { Gym } from 'src/gym/gym.entity';
+import { Gym } from '../gym/gym.entity';
 import { PromotionType } from './type-promotion.entity';
 
 @ObjectType()

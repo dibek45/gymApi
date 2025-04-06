@@ -6,6 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate src/migrations/init-tables -d src/data-source.ts",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -46,8 +48,7 @@
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
-    "subscriptions-transport-ws": "^0.11.0",
-    "typeorm": "^0.3.20"
+    "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -70,6 +71,8 @@
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "typeorm": "^0.3.22",
+    "typeorm-ts-node-commonjs": "^0.3.20",
     "typescript": "^5.8.2"
   },
   "jest": {

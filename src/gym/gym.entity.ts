@@ -1,14 +1,14 @@
 // src/gym/entities/gym.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { PettyCash } from 'src/point-of-sale/entities/petty-cash.entity';
-import { CashMovement } from 'src/point-of-sale/entities/cash-movement.entity';
-import { CashRegister } from 'src/point-of-sale/entities/cash-register.entity';
-import { Sale } from 'src/point-of-sale/entities/sale.entity';
-import { Promotion } from 'src/promotions/promotion.entity';
-import { Routine } from 'src/routines/routines.entity';
-import { ExerciseType } from 'src/routines/exercise-type.entity';
-import { Plan } from 'src/plan/plan.entity';
+import { PettyCash } from './../point-of-sale/entities/petty-cash.entity';
+import { CashMovement } from './../point-of-sale/entities/cash-movement.entity';
+import { CashRegister } from './../point-of-sale/entities/cash-register.entity';
+import { Sale } from './../point-of-sale/entities/sale.entity';
+import { Promotion } from './../promotions/promotion.entity';
+import { Routine } from './../routines/routines.entity';
+import { ExerciseType } from './../routines/exercise-type.entity';
+import { Plan } from '../plan/plan.entity';
 
 @Entity()
 @ObjectType()

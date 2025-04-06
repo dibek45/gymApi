@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { CashMovement } from './cash-movement.entity';
-import { Gym } from 'src/gym/gym.entity';
+import { Gym } from './../../gym/gym.entity';
 import { Cashier } from '../cashiers/entities/cashier.entity';
 import { Sale } from './sale.entity';
 

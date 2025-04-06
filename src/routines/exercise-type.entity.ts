@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Routine } from './routines.entity';
-import { Gym } from 'src/gym/gym.entity';
+import { Gym } from './../gym/gym.entity';
 
 @ObjectType()
 @Entity()
