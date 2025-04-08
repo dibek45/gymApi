@@ -30,8 +30,9 @@ export class Product {
   stock: number;
 
   @Column({ type: 'float' })
-  @Field(() => Int)
+  @Field(() => Float)
   price: number;
+  
 
   @Column({ type: 'int', nullable: true }) // Revisión aquí
   @Field(() => Int, { nullable: true }) // Revisión aquí
