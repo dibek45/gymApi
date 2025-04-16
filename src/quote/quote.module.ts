@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { QRCodeResolver } from 'src/qr-code/qr-code.resolver';
-import { QRCodeService } from 'src/qr-code/qr-code.service';
+
 import { Quote } from './entities/quote.entity';
+import { QuoteService } from './quote.service';
+import { QuoteResolver } from './quote.resolver';
 
 
 @Module({
   imports: [TypeOrmModule.forFeature([Quote])],
-  providers: [QRCodeService, QRCodeResolver],
+  providers: [QuoteService, QuoteResolver],
 })
+
 export class QuoteModule {}
