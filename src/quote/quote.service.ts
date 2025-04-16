@@ -11,14 +11,15 @@ export class QuoteService {
     private quoteRepo: Repository<Quote>,
   ) {}
 
-  async getQuoteOfTheDay(): Promise<Quote> {
+  async getQuoteOfTheDay(gymId: number): Promise<Quote>{
+
     const today = new Date();
     const start = new Date(today.getFullYear(), 0, 0);
     const diff = today.getTime() - start.getTime();
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor(diff / oneDay);
 
-    const quote = await this.quoteRepo.findOneBy({ dayOfYear });
+    const quote = await this.quoteRepo.findOneBy({ dayOfYear, gymId });
     return quote;
   }
 }
