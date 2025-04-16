@@ -9,4 +9,4 @@ import { Quote } from './entities/quote.entity';
   imports: [TypeOrmModule.forFeature([Quote])],
   providers: [QRCodeService, QRCodeResolver],
 })
-export class QRCodeModule {}
+export class QuoteModule {}

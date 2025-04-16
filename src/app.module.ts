@@ -25,6 +25,7 @@ import { RolesModule } from './rol/rol.module';
 import { AuthModule } from './auth/auth.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MachineModule } from './machine/machine.module';
+import { QuoteModule } from './quote/quote.module';
 
 @Module({
   imports: 
@@ -47,7 +48,7 @@ import { MachineModule } from './machine/machine.module';
               subscriptions: {
                 'subscriptions-transport-ws': true,
               },
-              
+              QuoteModule,
               plugins: [ApolloServerPluginLandingPageLocalDefault()],
             }),
           
