@@ -34,7 +34,7 @@ import { MachineModule } from './machine/machine.module';
             MulterModule.register({
               storage: 'memory', 
             }),
-
+            QRCodeModule,
             CategoryModule,
             PlanModule,
             UserModule,
