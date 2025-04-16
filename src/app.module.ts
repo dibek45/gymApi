@@ -48,10 +48,10 @@ import { QuoteModule } from './quote/quote.module';
               subscriptions: {
                 'subscriptions-transport-ws': true,
               },
-              QuoteModule,
+              
               plugins: [ApolloServerPluginLandingPageLocalDefault()],
             }),
-          
+            QuoteModule,
             TypeOrmModule.forRoot({
               type: 'postgres', 
               host: 'db',
