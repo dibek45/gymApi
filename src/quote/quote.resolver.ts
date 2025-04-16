@@ -7,8 +7,11 @@ import { Quote } from './entities/quote.entity';
 export class QuoteResolver {
   constructor(private readonly quoteService: QuoteService) {}
 
-  @Query(() => [Quote], { name: 'quotes' })
-  async getQuoteOfTheDay(      @Args('gymId', { type: () => Int, nullable: true }) gymId?: number,): Promise<Quote> {
+  @Query(() => Quote, { name: 'quoteOfTheDay' }) // nombre más claro
+  async getQuoteOfTheDay(
+    @Args('gymId', { type: () => Int, nullable: true }) gymId?: number,
+  ): Promise<Quote> {
     return this.quoteService.getQuoteOfTheDay(gymId);
   }
+  
 }
