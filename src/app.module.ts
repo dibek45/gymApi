@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from '@apollo/server/plugin/landingPage/default';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { PlanModule } from './plan/plan.module';
@@ -43,14 +43,21 @@ import { QuoteModule } from './quote/quote.module';
             ProductModule,
             GraphQLModule.forRoot<ApolloDriverConfig>({
               driver: ApolloDriver,
-              playground: false,
-              autoSchemaFile: true, // Automatically generates
+              playground: false, // this line is the only change in your code
               subscriptions: {
-                'subscriptions-transport-ws': true,
+                'graphql-ws': true,
+                'subscriptions-transport-ws': true, // necesario si usas Playground o Altair
               },
               
-              plugins: [ApolloServerPluginLandingPageLocalDefault()],
-            }),
+              plugins: [
+                process.env.NODE_ENV === 'production'
+                  ? ApolloServerPluginLandingPageProductionDefault()
+                  : ApolloServerPluginLandingPageLocalDefault({ embed: true }),
+              ],
+              
+              autoSchemaFile: true,
+              
+            }),            
             QuoteModule,
             TypeOrmModule.forRoot({
               type: 'postgres', 

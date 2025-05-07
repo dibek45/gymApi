@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class SeedQuotes implements MigrationInterface {
+export class  SeedQuotes1744835954236  implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const frasesReales = [
       { text: "Push yourself, because no one else is going to do it for you.", author: "Unknown" },

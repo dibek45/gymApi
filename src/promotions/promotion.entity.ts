@@ -63,8 +63,7 @@ export class Promotion {
   @UpdateDateColumn()
   @Field()
   updatedAt: Date;
-
-  @ManyToOne(() => PromotionType, () => PromotionType, { eager: true }) // Uso de una lambda
+  @ManyToOne(() => PromotionType, (promotionType) => promotionType.promotions, { eager: true })
   @JoinColumn({ name: 'promotionTypeId' })
   @Field(() => PromotionType)
   promotionType: PromotionType;
