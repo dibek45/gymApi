@@ -9,10 +9,13 @@ import { SaleDetail } from '../entities/sale-detail.entity';
 import { CashRegister } from '../entities/cash-register.entity';
 import { CashMovement } from '../entities/cash-movement.entity';
 import { UserService } from 'src/user/user.service';
+import { PubSubService } from 'src/shared/pub-sub.service';
 
 @Injectable()
 export class SaleService {
   constructor(
+    private readonly pubSubService: PubSubService,
+
     @InjectRepository(Sale) private saleRepository: Repository<Sale>,
     @InjectRepository(Gym) private gymRepository: Repository<Gym>,
     @InjectRepository(Product) private productRepository: Repository<Product>,
@@ -195,6 +198,9 @@ console.log(item)
     cashRegister.currentBalance = currentBalance + amount;
   
     await this.cashRegisterRepository.save(cashRegister);
+    await this.pubSubService.getPubSub().publish('cashRegisterUpdated', {
+      cashRegisterUpdated: cashRegister,
+    });
     console.log(`✅ Caja actualizada. Nuevo saldo: ${cashRegister.currentBalance}`);
   
    

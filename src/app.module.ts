@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } from '@apollo/server/plugin/landingPage/default';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { PlanModule } from './plan/plan.module';
@@ -24,6 +24,10 @@ import { RoutineModule } from './routines/routines.module';
 import { RolesModule } from './rol/rol.module';
 import { AuthModule } from './auth/auth.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MachineModule } from './machine/machine.module';
+import { QuoteModule } from './quote/quote.module';
+import { PubSub } from 'graphql-subscriptions';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: 
@@ -33,7 +37,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             MulterModule.register({
               storage: 'memory', 
             }),
-
+            QRCodeModule,
             CategoryModule,
             PlanModule,
             UserModule,
@@ -41,15 +45,21 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             ProductModule,
             GraphQLModule.forRoot<ApolloDriverConfig>({
               driver: ApolloDriver,
-              playground: false,
-              autoSchemaFile: true, // Automatically generates
-              subscriptions: {
-                'subscriptions-transport-ws': true,
-              },
+              playground: false, // this line is the only change in your code
+             
+            
               
-              plugins: [ApolloServerPluginLandingPageLocalDefault()],
-            }),
-          
+              
+              plugins: [
+                process.env.NODE_ENV === 'production'
+                  ? ApolloServerPluginLandingPageProductionDefault()
+                  : ApolloServerPluginLandingPageLocalDefault({ embed: true }),
+              ],
+              
+              autoSchemaFile: true,
+              
+            }),            
+            QuoteModule,
             TypeOrmModule.forRoot({
               type: 'postgres', 
               host: 'db',
@@ -58,9 +68,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
               password: 'postgres',
               database: 'postgres',
               entities: ['dist/**/*.entity.{ts,js}'],
-              synchronize: true, 
+              synchronize: false, 
               migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
               autoLoadEntities: true,
+              
             }),
             SocketModule,
             GymModule,
@@ -68,11 +79,17 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             PointOfSaleModule,
             PromotionModule,
             RoutineModule,
-            RolesModule
+            RolesModule,
+            MachineModule 
             
           ],
   controllers: [AppController],
-  providers: [AppService,WebsocketsGateway
+  providers: [AppService,WebsocketsGateway, AppGateway,
+
+    {
+      provide: 'PUB_SUB',
+      useValue: new PubSub(),
+    },
     //, {
     //provide: 'Upload',
     //useValue: GraphQLUpload, // Registra el scalar Upload

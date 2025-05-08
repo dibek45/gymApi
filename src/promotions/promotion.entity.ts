@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
-import { Gym } from 'src/gym/gym.entity';
+import { Gym } from '../gym/gym.entity';
 import { PromotionType } from './type-promotion.entity';
 
 @ObjectType()
@@ -63,8 +63,7 @@ export class Promotion {
   @UpdateDateColumn()
   @Field()
   updatedAt: Date;
-
-  @ManyToOne(() => PromotionType, () => PromotionType, { eager: true }) // Uso de una lambda
+  @ManyToOne(() => PromotionType, (promotionType) => promotionType.promotions, { eager: true })
   @JoinColumn({ name: 'promotionTypeId' })
   @Field(() => PromotionType)
   promotionType: PromotionType;

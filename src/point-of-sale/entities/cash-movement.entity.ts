@@ -10,8 +10,8 @@ import {
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { CashRegister } from './cash-register.entity';
 import { Sale } from './sale.entity';
-import { Gym } from 'src/gym/gym.entity';
-import { Cashier } from 'src/point-of-sale/cashiers/entities/cashier.entity';
+import { Gym } from './../../gym/gym.entity'
+import { Cashier } from '../cashiers/entities/cashier.entity';
 
 @Entity()
 @ObjectType()

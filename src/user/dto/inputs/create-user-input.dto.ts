@@ -16,7 +16,7 @@ export class CreateUser {
 
   @Field()
   @IsString()
-@IsOptional()
+  @IsOptional()
   huella: string; // DTO que recibe 'huella' como Buffer
 
   @Field()

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
 import { Field, Float, ID, Int, ObjectType } from '@nestjs/graphql';
-import { Category } from 'src/category/category.entity';
+import { Category } from '../category/category.entity';
 
 @ObjectType()
 @Entity()
@@ -30,8 +30,9 @@ export class Product {
   stock: number;
 
   @Column({ type: 'float' })
-  @Field(() => Int)
+  @Field(() => Float)
   price: number;
+  
 
   @Column({ type: 'int', nullable: true }) // Revisión aquí
   @Field(() => Int, { nullable: true }) // Revisión aquí

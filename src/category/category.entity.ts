@@ -1,7 +1,7 @@
 // src/category/entities/category.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Product } from 'src/product/product.entity';
+import { Product } from './../product/product.entity';
 
 @Entity()
 @ObjectType()

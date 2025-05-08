@@ -8,7 +8,11 @@ import { Observable, interval, map } from 'rxjs';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  
+  @Get('/health')
+getHealth() {
+  return 'ok';
+}
+
   @Get('huella')
   getSampleData(@Query('estado') estado: number): { name: string } {
     const resValue = estado;

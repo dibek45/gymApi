@@ -68,7 +68,6 @@ export class UserResolver {
 
         async createInput(@Args('createUser') createUser: CreateUser) {
             console.log("llega a resolver createUser")
-  
             console.log(createUser.gymId)
 
             return await this._user.create(createUser);

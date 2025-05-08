@@ -21,15 +21,7 @@ export class UserService {
     }
     
     async create(data: CreateUser): Promise<User> {
-      // ✅ Verificamos si el username ya existe
-      const existingUser = await this.userRepository.findOne({
-        where: { username: data.username }
-      });
-    
-      if (existingUser) {
-        console.log(`⚠️ Usuario con username "${data.username}" ya existe. No se creará otro.`);
-        throw new Error(`El username "${data.username}" ya está en uso.`);
-      }
+   
     
       const newUser = new User();
       
