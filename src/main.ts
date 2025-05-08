@@ -30,8 +30,9 @@ async function bootstrap() {
     'capacitor://localhost',
     'http://localhost:3000',
     'http://localhost:4200',
+    'https://studio.apollographql.com',
     'http://127.0.0.1:4200',
-    'http://192.168.1.75:3000',
+    'https://sandbox.embed.apollographql.com',
   ];
   
   app.enableCors({
@@ -61,6 +62,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true, // Throw error if non-whitelisted properties exist
     }),
   );
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   // 🔹 Start the HTTP Server
   await app.listen(3000, '0.0.0.0');

@@ -1,13 +1,17 @@
 import { Resolver, Query, Mutation, Args, Int, Subscription } from '@nestjs/graphql';
+import { Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
+
 import { CashRegisterService } from '../services/cash-register.service';
 import { CashRegister } from '../entities/cash-register.entity';
 import { CreateCashRegisterInput } from '../dto/create-cash-register.dto';
-import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => CashRegister)
 export class CashRegisterResolver {
-  constructor(private readonly cashRegisterService: CashRegisterService) {}
-  private pubSub = new PubSub(); // ✅ Así se declara correctamente
+  constructor(
+    private readonly cashRegisterService: CashRegisterService,
+    @Inject('PUB_SUB') private readonly pubSub: PubSub,
+  ) {}
 
   @Query(() => [CashRegister])
   async getAllCashRegisters(
@@ -28,37 +32,32 @@ export class CashRegisterResolver {
   async createCashRegister(
     @Args('input') input: CreateCashRegisterInput,
   ): Promise<CashRegister> {
-    return this.cashRegisterService.create(input);
-  }
+    const newRegister = await this.cashRegisterService.create(input);
 
-
-  @Subscription(() => CashRegister, {
-    filter: (payload, variables) => payload.cashRegisterUpdated.gymId === variables.gymId,
-  })
-  cashRegisterUpdated2(@Args('gymId', { type: () => Int }) gymId: number) {
-    return this.pubSub.asyncIterator('cashRegisterUpdated');
-  }
-  
-
-
-  @Query(() => Boolean)
-  async testCashRegisterUpdate2(): Promise<boolean> {
+    console.log('📣 Publicando cashRegisterUpdated:', {
+      id: newRegister.id,
+      gymId: newRegister.gym?.id ?? newRegister.gymId,
+    });
     await this.pubSub.publish('cashRegisterUpdated', {
       cashRegisterUpdated: {
-        id: 1,
-        currentBalance: 100,
-        gymId: 1,
+        ...newRegister,
+        gymId: newRegister.gym?.id ?? newRegister.gymId, // asegúrate que exista gymId directo
       },
     });
-    return true;
+    
+
+    return newRegister;
   }
 
-  // tu suscripción debería verse así:
   @Subscription(() => CashRegister, {
-    name: 'cashRegisterUpdated',
-    filter: (payload, variables) => payload.cashRegisterUpdated.gymId === variables.gymId,
+    filter: (payload, variables) => {
+      console.log('📡 FILTRO', payload.cashRegisterUpdated);
+      return payload.cashRegisterUpdated.gymId === variables.gymId;
+    },    
   })
-  cashRegisterUpdated(@Args('gymId', { type: () => Int }) gymId: number) {
+  cashRegisterUpdated(
+    @Args('gymId', { type: () => Int }) gymId: number,
+  ) {
     return this.pubSub.asyncIterator('cashRegisterUpdated');
   }
 }

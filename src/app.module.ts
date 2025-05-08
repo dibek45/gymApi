@@ -26,6 +26,8 @@ import { AuthModule } from './auth/auth.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MachineModule } from './machine/machine.module';
 import { QuoteModule } from './quote/quote.module';
+import { PubSub } from 'graphql-subscriptions';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: 
@@ -44,10 +46,9 @@ import { QuoteModule } from './quote/quote.module';
             GraphQLModule.forRoot<ApolloDriverConfig>({
               driver: ApolloDriver,
               playground: false, // this line is the only change in your code
-              subscriptions: {
-                'graphql-ws': true,
-                'subscriptions-transport-ws': true, // necesario si usas Playground o Altair
-              },
+             
+            
+              
               
               plugins: [
                 process.env.NODE_ENV === 'production'
@@ -70,6 +71,7 @@ import { QuoteModule } from './quote/quote.module';
               synchronize: false, 
               migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
               autoLoadEntities: true,
+              
             }),
             SocketModule,
             GymModule,
@@ -82,7 +84,12 @@ import { QuoteModule } from './quote/quote.module';
             
           ],
   controllers: [AppController],
-  providers: [AppService,WebsocketsGateway
+  providers: [AppService,WebsocketsGateway, AppGateway,
+
+    {
+      provide: 'PUB_SUB',
+      useValue: new PubSub(),
+    },
     //, {
     //provide: 'Upload',
     //useValue: GraphQLUpload, // Registra el scalar Upload
