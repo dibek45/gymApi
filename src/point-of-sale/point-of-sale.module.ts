@@ -17,9 +17,11 @@ import { Cashier } from './cashiers/entities/cashier.entity';
 import { UserModule } from 'src/user/user.module';
 import { SharedModule } from 'src/shared/share.module';
 import { PubSubModule } from './pubsub.module';
+import { UpdateVersionModule } from 'src/update-version/update-version.module';
 
 @Module({
   imports: [
+    UpdateVersionModule,
     SharedModule,
     TypeOrmModule.forFeature([Sale, CashMovement, PettyCash,Product, CashRegister,Cashier]), // Registrar entidades específicas del módulo
     GymModule, // Importar el módulo de Gym para acceder al repositorio de Gym
