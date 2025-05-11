@@ -24,7 +24,7 @@ export class UpdateVersionService {
       .values({ gym_id: gymId, table_name: tableName })
       .orUpdate({ conflict_target: ['gym_id', 'table_name'], overwrite: ['updated_at'] })
       .execute();
-  
+                  
     console.log(`✅ [UpdateVersionService] UPSERT ejecutado para ${tableName} del gym ${gymId}`);
   }
   

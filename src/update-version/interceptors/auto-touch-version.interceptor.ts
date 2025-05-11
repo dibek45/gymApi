@@ -19,6 +19,8 @@ import { UpdateVersionService } from '../update-version.service';
     ) {}
   
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+      console.log('🛑 Interceptor ejecutado');
+
       const gqlCtx = GqlExecutionContext.create(context);
       const table = this.reflector.get<string>(
         AUTO_TOUCH_VERSION_KEY,
