@@ -5,12 +5,16 @@ import { PubSub } from 'graphql-subscriptions';
 import { CashRegisterService } from '../services/cash-register.service';
 import { CashRegister } from '../entities/cash-register.entity';
 import { CreateCashRegisterInput } from '../dto/create-cash-register.dto';
+import { UpdateVersionService } from 'src/update-version/update-version.service';
+import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
 
 @Resolver(() => CashRegister)
 export class CashRegisterResolver {
   constructor(
     private readonly cashRegisterService: CashRegisterService,
     @Inject('PUB_SUB') private readonly pubSub: PubSub,
+    private readonly updateVersionService: UpdateVersionService
+
   ) {}
 
   @Query(() => [CashRegister])
@@ -29,6 +33,7 @@ export class CashRegisterResolver {
   }
 
   @Mutation(() => CashRegister)
+  @AutoTouchVersion('cashRegisters')
   async createCashRegister(
     @Args('input') input: CreateCashRegisterInput,
   ): Promise<CashRegister> {

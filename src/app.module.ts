@@ -28,6 +28,7 @@ import { MachineModule } from './machine/machine.module';
 import { QuoteModule } from './quote/quote.module';
 import { PubSub } from 'graphql-subscriptions';
 import { AppGateway } from './app.gateway';
+import { UpdateVersionModule } from './update-version/update-version.module';
 
 @Module({
   imports: 
@@ -80,7 +81,8 @@ import { AppGateway } from './app.gateway';
             PromotionModule,
             RoutineModule,
             RolesModule,
-            MachineModule 
+            MachineModule,
+            UpdateVersionModule 
             
           ],
   controllers: [AppController],
