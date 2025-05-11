@@ -1,17 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
-@Entity('update_versions')
-@Unique(['gym_id', 'table_name'])
+@ObjectType()
 export class UpdateVersion {
-  @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
-  @Column()
+  @Field(() => Int)
   gym_id: number;
 
-  @Column()
+  @Field()
   table_name: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Field()
   updated_at: Date;
 }
