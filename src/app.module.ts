@@ -29,6 +29,8 @@ import { QuoteModule } from './quote/quote.module';
 import { PubSub } from 'graphql-subscriptions';
 import { AppGateway } from './app.gateway';
 import { UpdateVersionModule } from './update-version/update-version.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptors/auto-touch-version.interceptor';
 
 @Module({
   imports: 
@@ -87,7 +89,10 @@ import { UpdateVersionModule } from './update-version/update-version.module';
           ],
   controllers: [AppController],
   providers: [AppService,WebsocketsGateway, AppGateway,
-
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AutoTouchVersionGraphQLInterceptor
+    },
     {
       provide: 'PUB_SUB',
       useValue: new PubSub(),
