@@ -1,0 +1,7 @@
+CREATE TABLE update_versions (
+  id SERIAL PRIMARY KEY,
+  gym_id INTEGER NOT NULL,
+  table_name VARCHAR(50) NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT now(),
+  UNIQUE (gym_id, table_name)
+);
