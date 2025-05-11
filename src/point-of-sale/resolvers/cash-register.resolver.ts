@@ -32,27 +32,41 @@ export class CashRegisterResolver {
     return this.cashRegisterService.findOne(id);
   }
 
+  
+
   @Mutation(() => CashRegister)
   @AutoTouchVersion('cashRegisters')
   async createCashRegister(
     @Args('input') input: CreateCashRegisterInput,
   ): Promise<CashRegister> {
     const newRegister = await this.cashRegisterService.create(input);
-
+  
+    const gymIdFinal = newRegister.gym?.id ?? newRegister.gymId;
+  
     console.log('📣 Publicando cashRegisterUpdated:', {
       id: newRegister.id,
-      gymId: newRegister.gym?.id ?? newRegister.gymId,
+      gymId: gymIdFinal,
     });
+  
     await this.pubSub.publish('cashRegisterUpdated', {
       cashRegisterUpdated: {
         ...newRegister,
-        gymId: newRegister.gym?.id ?? newRegister.gymId, // asegúrate que exista gymId directo
+        gymId: gymIdFinal,
       },
     });
-    
-
-    return newRegister;
+  
+    // ✅ Este return asegura que el interceptor lo detecte
+    console.log('📦 Devolviendo desde la mutación:', {
+      ...newRegister,
+      gymId: gymIdFinal,
+    });
+  
+    return {
+      ...newRegister,
+      gymId: gymIdFinal,
+    };
   }
+  
 
   @Subscription(() => CashRegister, {
     filter: (payload, variables) => {
