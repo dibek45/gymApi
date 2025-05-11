@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity()
+@Entity('update_versions') // 👈 nombre exacto de la tabla real en la DB
 export class UpdateVersion {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
