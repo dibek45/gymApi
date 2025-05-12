@@ -18,6 +18,7 @@ import { UserModule } from 'src/user/user.module';
 import { SharedModule } from 'src/shared/share.module';
 import { PubSubModule } from './pubsub.module';
 import { UpdateVersionModule } from 'src/update-version/update-version.module';
+import { SocketModule } from 'src/socket.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { UpdateVersionModule } from 'src/update-version/update-version.module';
     TypeOrmModule.forFeature([Sale, CashMovement, PettyCash,Product, CashRegister,Cashier]), // Registrar entidades específicas del módulo
     GymModule, // Importar el módulo de Gym para acceder al repositorio de Gym
     UserModule,
-    PubSubModule
+    PubSubModule,
+    SocketModule
   ],
   providers: [
     SaleService,

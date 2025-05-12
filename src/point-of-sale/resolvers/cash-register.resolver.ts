@@ -62,9 +62,10 @@ export class CashRegisterResolver {
       ...newRegister,
       gymId: gymIdFinal,
     });
-this.gateway.server.emit('cashRegisterUpdated', {
+
+this.gateway.server.to(`gym-${newRegister.gymId}`).emit('cashRegisterUpdated', {
   ...newRegister,
-  gymId: gymIdFinal
+  gymId: gymIdFinal,
 });
 
     return {

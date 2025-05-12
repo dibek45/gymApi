@@ -27,7 +27,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MachineModule } from './machine/machine.module';
 import { QuoteModule } from './quote/quote.module';
 import { PubSub } from 'graphql-subscriptions';
-import { AppGateway } from './app.gateway';
 import { UpdateVersionModule } from './update-version/update-version.module';
 import { APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptors/auto-touch-version.interceptor';
@@ -88,7 +87,7 @@ import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptor
             
           ],
   controllers: [AppController],
-  providers: [AppService,WebsocketsGateway, AppGateway,
+  providers: [AppService,WebsocketsGateway,
         Reflector, // 👈✅ AGREGAR ESTA LÍNEA AQUÍ
 
     {
@@ -104,6 +103,7 @@ import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptor
     //useValue: GraphQLUpload, // Registra el scalar Upload
  // },
 ],
+
 }
 )
 export class AppModule {}
