@@ -7,13 +7,15 @@ import { CashRegister } from '../entities/cash-register.entity';
 import { CreateCashRegisterInput } from '../dto/create-cash-register.dto';
 import { UpdateVersionService } from 'src/update-version/update-version.service';
 import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
+import { AppGateway } from 'src/app.gateway';
 
 @Resolver(() => CashRegister)
 export class CashRegisterResolver {
   constructor(
     private readonly cashRegisterService: CashRegisterService,
     @Inject('PUB_SUB') private readonly pubSub: PubSub,
-    private readonly updateVersionService: UpdateVersionService
+    private readonly updateVersionService: UpdateVersionService,
+    private gateway:AppGateway
 
   ) {}
 
@@ -42,7 +44,7 @@ export class CashRegisterResolver {
     const newRegister = await this.cashRegisterService.create(input);
   
     const gymIdFinal = newRegister.gym?.id ?? newRegister.gymId;
-  
+  /*
     console.log('📣 Publicando cashRegisterUpdated:', {
       id: newRegister.id,
       gymId: gymIdFinal,
@@ -54,19 +56,36 @@ export class CashRegisterResolver {
         gymId: gymIdFinal,
       },
     });
-  
+  */
     // ✅ Este return asegura que el interceptor lo detecte
     console.log('📦 Devolviendo desde la mutación:', {
       ...newRegister,
       gymId: gymIdFinal,
     });
-  
+this.gateway.server.emit('cashRegisterUpdated', {
+  ...newRegister,
+  gymId: gymIdFinal
+});
+
     return {
       ...newRegister,
       gymId: gymIdFinal,
     };
   }
   
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
   @Subscription(() => CashRegister, {
     filter: (payload, variables) => {
@@ -78,5 +97,5 @@ export class CashRegisterResolver {
     @Args('gymId', { type: () => Int }) gymId: number,
   ) {
     return this.pubSub.asyncIterator('cashRegisterUpdated');
-  }
+  }*/
 }
