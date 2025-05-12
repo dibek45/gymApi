@@ -33,7 +33,9 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
       handleUpdateCashRegister(@MessageBody() updatedCashRegister: CashRegister) {
         console.log('📦 Caja actualizada recibida:', updatedCashRegister);
         // 🔁 Emitir a todos los clientes conectados
-        this.server.emit('cashRegisterUpdated', updatedCashRegister);
+        const room = `gym-${updatedCashRegister.gymId}`;
+        this.logger.log(`📤 Enviando cashRegisterUpdated a sala: ${room}`);
+        this.server.to(room).emit('cashRegisterUpdated', updatedCashRegister);
   }
 @SubscribeMessage('joinRoom')
 handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
