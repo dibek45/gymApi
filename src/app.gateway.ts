@@ -4,7 +4,10 @@ import {
     MessageBody,
     WebSocketServer,
     OnGatewayConnection,
+    ConnectedSocket,
   } from '@nestjs/websockets';
+  import { Logger } from '@nestjs/common';
+
   import { Server, Socket } from 'socket.io';
 import { CashRegister } from './point-of-sale/entities/cash-register.entity';
   
@@ -12,7 +15,8 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
   export class AppGateway implements OnGatewayConnection {
     @WebSocketServer()
     server: Server;
-  
+    private readonly logger = new Logger(AppGateway.name); // ✅ <--- esto es lo que falta
+
     handleConnection(client: Socket) {
       console.log(`🟢 Cliente conectado: ${client.id}`);
       this.server.emit('pong', `Nuevo cliente conectado: ${client.id}`);
@@ -31,6 +35,11 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
         // 🔁 Emitir a todos los clientes conectados
         this.server.emit('cashRegisterUpdated', updatedCashRegister);
   }
+@SubscribeMessage('joinRoom')
+handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
+  client.join(room);
+  this.logger.log(`Cliente unido a la sala: ${room}`);
+}
 
   }
   
