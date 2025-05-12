@@ -37,7 +37,9 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
         this.logger.log(`📤 Enviando cashRegisterUpdated a sala: ${room}`);
         this.server.to(room).emit('cashRegisterUpdated', updatedCashRegister);
   }
-@SubscribeMessage('joinRoom')
+
+
+@SubscribeMessage('joinGym')
 handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
   client.join(room);
   this.logger.log(`Cliente unido a la sala: ${room}`);
