@@ -40,8 +40,8 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
 
 
 @SubscribeMessage('joinGym')
-handleJoinGym(@MessageBody() gymId: number, @ConnectedSocket() client: Socket) {
- this.logger.log(`📥 joinGym recibido con: ${JSON.stringify(gymId)}`);
+handleJoinGym(@MessageBody() gymId: string | number, @ConnectedSocket() client: Socket) {
+  this.logger.log(`📥 joinGym recibido con: ${JSON.stringify(gymId)}`);
 
   const room = typeof gymId === 'string' && gymId.startsWith('gym-')
     ? gymId
