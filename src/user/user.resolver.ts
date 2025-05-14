@@ -7,6 +7,8 @@ import { Get } from '@nestjs/common';
 import { Observable, interval, map } from 'rxjs';
 import { WebsocketsGateway } from 'src/socket/gateway';
 import { UpdateAvailableDaysDto, UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
+import { AppGateway } from 'src/app.gateway';
+import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
 
 const pubSub = new PubSub();
 
@@ -14,6 +16,8 @@ const pubSub = new PubSub();
 export class UserResolver {
     constructor(private readonly _socketService: WebsocketsGateway,
         private readonly _user:UserService,
+          private readonly gateway: AppGateway // ✅ inyección del WebSocket gateway
+
       )
     {
 
@@ -41,8 +45,8 @@ export class UserResolver {
     }
     
 
-    @Query(() => User, { name: 'user' })
-    async findOne(@Args('id', { type: () => Int }) id: number) {
+ @Query(() => User, { name: 'user' })
+async findOne(@Args('id', { type: () => Int }) id: number) {
         console.log("entra a el resolver")
         const foundUser = await this._user.findOne(id);
         console.log(foundUser)
@@ -50,8 +54,8 @@ export class UserResolver {
         return foundUser;
     }
 
-    @Query(() => User, { name: 'userByHuella' })
-    async findByHuella(@Args('huella', { type: () => String }) huella: string) {
+@Query(() => User, { name: 'userByHuella' })
+async findByHuella(@Args('huella', { type: () => String }) huella: string) {
         console.log("LLEGA A RESOLVER")
 
         const foundUser = await this._user.findByHuella(huella);
@@ -63,26 +67,39 @@ export class UserResolver {
         return foundUser;
     }
 
+@AutoTouchVersion('members') // ✅
+@Mutation(() => User, { name: "createUser" })
+async createInput(@Args('createUser') createUser: CreateUser) {
+  console.log("📥 Resolver: createUser", createUser.gymId);
 
-    @Mutation(() => User, { name: "createUser" })
+  const newUser = await this._user.create(createUser);
 
-        async createInput(@Args('createUser') createUser: CreateUser) {
-            console.log("llega a resolver createUser")
-            console.log(createUser.gymId)
+  // 🛰 Emitir evento por WebSocket
+  this.gateway.server.to(`gym-${newUser.gymId}`).emit('memberUpdated', {
+    ...newUser,
+    gymId: newUser.gymId,
+  });
 
-            return await this._user.create(createUser);
+  return newUser;
 }
 
 
-    @Mutation( () => User,{name:"updateUserByDS"})
-    updateInput(
-        @Args('updateUser') UpdateUser:UpdateUser
-    ){
-        return this._user.update(UpdateUser);
-    }
+@AutoTouchVersion('members') // ✅
+@Mutation(() => User, { name: "updateUserByDS" })
+async updateInput(@Args('updateUser') updateUser: UpdateUser) {
+  const updated = await this._user.update(updateUser);
 
-    @Mutation( () => User,{name:"updateFingerPrintUserByID"})
-    updateID(
+  this.gateway.server.to(`gym-${updated.gymId}`).emit('memberUpdated', {
+    ...updated,
+    gymId: updated.gymId,
+  });
+
+  return updated;
+}
+
+@AutoTouchVersion('members') // ✅
+@Mutation( () => User,{name:"updateFingerPrintUserByID"})
+  updateID(
         @Args('updateFingerPrintUserByID') updateFingerPrintUserByID:UpdateFingerPrintUserByID
     ){
         console.log("llega al servicio update fingerPrint")
@@ -92,30 +109,48 @@ export class UserResolver {
 
 
 
-    @Mutation( () => User,{name:"getSatusUser"})
+@Mutation( () => User,{name:"getSatusUser"})
     getSatus(@Args('id',{ type: ()=>Int}) id:number){
         return this._user.getStatus(id);
-    }
+}
 
-    
-    @Mutation( () => Boolean,{name:"deleteUser"})
-    delete(@Args('id',{ type: ()=>Int}) id:number){
-        return this._user.deleteUser(id);
-    }
+@AutoTouchVersion('members') // ✅
+@Mutation(() => Boolean, { name: "deleteUser" })
+async delete(@Args('id', { type: () => Int }) id: number) {
+  const user = await this._user.findOne(id); // ⬅️ Obtener user para saber su gymId
+  const deleted = await this._user.deleteUser(id);
+
+  if (user?.gymId) {
+    this.gateway.server.to(`gym-${user.gymId}`).emit('memberDeleted', { id });
+  }
+
+  return deleted;
+}
 
 
-    @Subscription(() => User)
-    newUser() {
+
+@Subscription(() => User)
+newUser() {
     return pubSub.asyncIterator('newUser'); // Maneja la suscripción para el evento newUser
+}
+
+
+@AutoTouchVersion('members') // ✅
+@Mutation(() => User, { name: 'updateAvailableDays' })
+async updateAvailableDays(
+  @Args('updateAvailableDaysInput') updateAvailableDaysInput: UpdateAvailableDaysDto,
+) {
+  const updatedUser = await this._user.updateAvailableDays(updateAvailableDaysInput);
+
+  if (updatedUser?.gymId) {
+    this.gateway.server.to(`gym-${updatedUser.gymId}`).emit('memberUpdated', {
+      ...updatedUser,
+      gymId: updatedUser.gymId,
+    });
   }
 
+  return updatedUser;
+}
 
-
-  @Mutation(() => User, { name: 'updateAvailableDays' })
-  updateAvailableDays(
-    @Args('updateAvailableDaysInput') updateAvailableDaysInput: UpdateAvailableDaysDto,
-  ) {
-    return this._user.updateAvailableDays(updateAvailableDaysInput);
-  }
   
 }

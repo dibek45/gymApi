@@ -29,7 +29,7 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
     }
 
 
-    @SubscribeMessage('updateCashRegister')
+  @SubscribeMessage('updateCashRegister')
       handleUpdateCashRegister(@MessageBody() updatedCashRegister: CashRegister) {
         console.log('📦 Caja actualizada recibida:', updatedCashRegister);
         // 🔁 Emitir a todos los clientes conectados
@@ -37,6 +37,7 @@ import { CashRegister } from './point-of-sale/entities/cash-register.entity';
         this.logger.log(`📤 Enviando cashRegisterUpdated a sala: ${room}`);
         this.server.to(room).emit('cashRegisterUpdated', updatedCashRegister);
   }
+
 
 
 @SubscribeMessage('joinGym')
@@ -49,6 +50,14 @@ handleJoinGym(@MessageBody() gymId: string | number, @ConnectedSocket() client: 
 
   client.join(room);
   this.logger.log(`✅ Cliente unido a la sala: ${room}`);
+}
+
+
+
+  emitMemberUpdate(member: any) {
+  const room = `gym-${member.gymId}`;
+  this.logger.log(`📤 Enviando memberUpdated a sala: ${room}`);
+  this.server.to(room).emit('memberUpdated', member);
 }
 
 
