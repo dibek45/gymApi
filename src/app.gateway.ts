@@ -10,6 +10,7 @@ import {
 
   import { Server, Socket } from 'socket.io';
 import { CashRegister } from './point-of-sale/entities/cash-register.entity';
+import { Product } from './product/product.entity';
   
   @WebSocketGateway({ cors: { origin: '*' } })
   export class AppGateway implements OnGatewayConnection {
@@ -61,6 +62,17 @@ handleJoinGym(@MessageBody() gymId: string | number, @ConnectedSocket() client: 
 }
 
 
+
+
+  // ✅ Producto actualizado
+  emitProductUpdate(product: Product) {
+    const room = `gym-${product.gymId}`;
+    this.logger.log(`📤 Enviando productUpdated a sala: ${room}`);
+    this.server.to(room).emit('productUpdated', product);
+  }
+
+
+  
   }
   
   

@@ -10,75 +10,64 @@ import { UpdateProduct } from './dto/inputs/update-product.input.dto';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { ImageService } from 'src/uploads/imgCustom';
+import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
+import { AppGateway } from 'src/app.gateway';
 
-const pubSub = new PubSub();
 
 @Resolver()
 export class ProductResolver {
-    constructor(
-        private readonly _socketService: WebsocketsGateway,
-        private readonly _product: ProductService,
-    ) {}
+  constructor(
+    private readonly _socketService: AppGateway,
+    private readonly _product: ProductService
+  ) {}
 
-    @Query(() => [Product], { name: 'productsByGymId' })
-    async findAll(
-        @Args('gymId', { type: () => Number }) gymId: number,
-        @Args('productId', { nullable: true }) productId?: number
-    ) {
-        return this._product.findAllByGymId(gymId, productId);
-    }
+  @Query(() => [Product], { name: 'productsByGymId' })
+  async findAll(
+    @Args('gymId', { type: () => Number }) gymId: number,
+    @Args('productId', { nullable: true }) productId?: number
+  ) {
+    return this._product.findAllByGymId(gymId, productId);
+  }
 
-    @Query(() => Product, { name: 'product' })
-    async findOne(@Args('id', { type: () => Int }) id: number) {
-        console.log("entra a el resolver");
-        const foundProduct = await this._product.findOne(id);
-        console.log(foundProduct);
+  @Query(() => Product, { name: 'product' })
+  async findOne(@Args('id', { type: () => Int }) id: number) {
+    const foundProduct = await this._product.findOne(id);
+    return foundProduct;
+  }
 
-        return foundProduct;
-    }
+  @AutoTouchVersion('products')
+  @Mutation(() => Product, { name: "updateProductByDS" })
+  async updateInput(@Args('updateProduct') updateProduct: UpdateProduct) {
+    const updatedProduct = await this._product.update(updateProduct);
+    this._socketService.emitProductUpdate(updatedProduct); // ✅ emite a la sala correcta
+    return updatedProduct;
+  }
 
+  @AutoTouchVersion('products')
+  @Mutation(() => Product, { name: "getStatusProduct" })
+  async getStatus(@Args('id', { type: () => Int }) id: number) {
+    const updated = await this._product.getStatus(id);
+    this._socketService.emitProductUpdate(updated); // ✅ emite a la sala correcta
+    return updated;
+  }
 
-    
+  @AutoTouchVersion('products')
+  @Mutation(() => Boolean, { name: "deleteProduct" })
+  async delete(@Args('id', { type: () => Int }) id: number) {
+    const deleted = await this._product.deleteProduct(id);
+    // Opcional: emitir un evento si quieres notificar el borrado
+    return deleted;
+  }
 
-    @Mutation(() => Product, { name: "updateProductByDS" })
-    updateInput(@Args('updateProduct') updateProduct: UpdateProduct) {
-        return this._product.update(updateProduct);
-    }
+  @Mutation(() => Product, { name: "createProduct" })
+  async createInput(@Args('createProduct') createProduct: CreateProduct) {
+    const newProduct = await this._product.create(createProduct);
+    this._socketService.emitProductUpdate(newProduct); // ✅ emite a la sala correcta
+    return newProduct;
+  }
 
-   
-    @Mutation(() => Product, { name: "getStatusProduct" })
-    getStatus(@Args('id', { type: () => Int }) id: number) {
-        return this._product.getStatus(id);
-    }
-
-    @Mutation(() => Boolean, { name: "deleteProduct" })
-    delete(@Args('id', { type: () => Int }) id: number) {
-        return this._product.deleteProduct(id);
-    }
-
-    @Subscription(() => Product)
-    newProduct() {
-        return pubSub.asyncIterator('newProduct'); // Maneja la suscripción para el evento newProduct
-    }
-
-
-    @Query(() => String)
-    async getName(): Promise<string> {
-        return 'Coding by Anas';
-    }
-
-
-     
-    
-
-
-
-      
-    @Mutation(() => Product, { name: "createProduct" })
-    async createInput(@Args('createProduct') createProduct: CreateProduct) {
-        console.log("llega a resolver createProduct");
-        console.log(createProduct.gymId);
-        return await this._product.create(createProduct);
-    }
-    
+  @Query(() => String)
+  async getName(): Promise<string> {
+    return 'Coding by Anas';
+  }
 }
