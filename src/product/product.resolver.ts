@@ -59,6 +59,7 @@ export class ProductResolver {
     return deleted;
   }
 
+@AutoTouchVersion('products')
   @Mutation(() => Product, { name: "createProduct" })
   async createInput(@Args('createProduct') createProduct: CreateProduct) {
     const newProduct = await this._product.create(createProduct);
