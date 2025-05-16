@@ -37,8 +37,13 @@ export class CashiersService {
     return this.cashierRepo.save(cashier);
   }
 
-  // Eliminar un cajero por ID
-  async remove(id: number): Promise<void> {
-    await this.cashierRepo.delete(id);
-  }
+async remove(id: number): Promise<{ gymId: number }> {
+  const cashier = await this.cashierRepo.findOne({ where: { id } });
+  if (!cashier) throw new Error(`Cashier with ID ${id} not found`);
+
+  await this.cashierRepo.delete(id);
+
+  return { gymId: cashier.gymId }; // para que el resolver pueda emitir el socket
+}
+
 }

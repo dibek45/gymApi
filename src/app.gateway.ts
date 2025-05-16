@@ -11,6 +11,7 @@ import {
   import { Server, Socket } from 'socket.io';
 import { CashRegister } from './point-of-sale/entities/cash-register.entity';
 import { Product } from './product/product.entity';
+import { Cashier } from './point-of-sale/cashiers/entities/cashier.entity';
   
   @WebSocketGateway({ cors: { origin: '*' } })
   export class AppGateway implements OnGatewayConnection {
@@ -72,7 +73,15 @@ handleJoinGym(@MessageBody() gymId: string | number, @ConnectedSocket() client: 
   }
 
 
-  
+  emitCashierUpdate(updated: Cashier) {
+  this.server.to(`gym-${updated.gymId}`).emit('cashierUpdated', updated);
+}
+
+// app.gateway.ts
+emitCashierDeleted(cashierId: number, gymId: number) {
+  this.server.to(`gym-${gymId}`).emit('cashierDeleted', { id: cashierId });
+}
+
   }
   
   

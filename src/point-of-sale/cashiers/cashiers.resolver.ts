@@ -3,10 +3,13 @@ import { CashiersService } from './cashiers.service';
 import { Cashier } from './entities/cashier.entity';
 import { CreateCashierDto } from './dto/create-cashier.dto';
 import { UpdateCashierDto } from './dto/update-cashier.dto';
+import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
+import { AppGateway } from 'src/app.gateway';
 
 @Resolver(() => Cashier)
 export class CashiersResolver {
-  constructor(private readonly cashiersService: CashiersService) {}
+  constructor(private readonly cashiersService: CashiersService,  private readonly socketGateway: AppGateway
+) {}
 
   // Obtener todos los cajeros
   @Query(() => [Cashier], { name: 'cashiers' })
@@ -21,21 +24,34 @@ export class CashiersResolver {
   }
 
   // Crear un nuevo cajero
+  @AutoTouchVersion('cashiers')
   @Mutation(() => Cashier)
-  createCashier(@Args('createCashierInput') createCashierInput: CreateCashierDto) {
-    return this.cashiersService.create(createCashierInput);
+  async createCashier(@Args('createCashierInput') createCashierInput: CreateCashierDto) {
+  const newCashier = await this.cashiersService.create(createCashierInput);
+  this.socketGateway.emitCashierUpdate(newCashier); // ✅ ya es un Cashier
+  return newCashier;
   }
 
   // Actualizar un cajero existente
-  @Mutation(() => Cashier)
-updateCashier(@Args('updateCashierInput') updateCashierInput: UpdateCashierDto): Promise<Cashier> {
-  return this.cashiersService.update(updateCashierInput.id, updateCashierInput);
+@AutoTouchVersion('cashiers')
+@Mutation(() => Cashier)
+async updateCashier(
+  @Args('updateCashierInput') updateCashierInput: UpdateCashierDto
+): Promise<Cashier> {
+  const updated = await this.cashiersService.update(updateCashierInput.id, updateCashierInput);
+
+  this.socketGateway.emitCashierUpdate(updated); // ✅ Aquí se emite ya con el objeto completo
+  return updated;
 }
 
 
-  // Eliminar un cajero por ID
-  @Mutation(() => Boolean)
-  removeCashier(@Args('id', { type: () => Int }) id: number) {
-    return this.cashiersService.remove(id).then(() => true);
-  }
+
+@Mutation(() => Boolean)
+@AutoTouchVersion('cashiers')
+async removeCashier(@Args('id', { type: () => Int }) id: number) {
+  const { gymId } = await this.cashiersService.remove(id);
+  this.socketGateway.emitCashierDeleted(id, gymId);
+  return true;
+}
+
 }
