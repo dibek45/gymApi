@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CashRegister } from '../entities/cash-register.entity';
@@ -127,6 +127,22 @@ async close(id: number): Promise<CashRegister> {
   cashRegister.closingBalance = cashRegister.currentBalance;
 
   return this.cashRegisterRepository.save(cashRegister);
+}
+
+
+async delete(id: number): Promise<{ gymId: number }> {
+  const cashRegister = await this.cashRegisterRepository.findOne({
+    where: { id },
+    relations: { gym: true }
+  });
+
+  if (!cashRegister) {
+    throw new NotFoundException(`Cash register with ID ${id} not found`);
+  }
+
+  await this.cashRegisterRepository.remove(cashRegister);
+
+  return { gymId: cashRegister.gym.id };
 }
 
 }

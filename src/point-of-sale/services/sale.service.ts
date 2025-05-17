@@ -87,6 +87,17 @@ export class SaleService {
 
     await this.saleRepository.save(sale);
     console.log(`✅ Venta guardada con ID: ${sale.id}`);
+// 🔄 ACTUALIZACIÓN DE VERSIÓN LOCAL SEGÚN EL TIPO DE ITEMS
+    const hayProductos = cart.some(item => !item.isMembership);
+    const hayMembresias = cart.some(item => item.isMembership);
+
+    if (hayProductos) {
+  await this.pubSubService.touchVersion(gymId, 'products');
+    }
+
+    if (hayMembresias) {
+      await this.pubSubService.touchVersion(gym.id, 'members');
+    }
 
     return sale;
 }

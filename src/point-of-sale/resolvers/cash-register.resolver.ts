@@ -69,4 +69,16 @@ async closeCashRegister(@Args('id', { type: () => Int }) id: number) {
   return this.cashRegisterService.close(id);
 }
 
+@Mutation(() => Boolean)
+@AutoTouchVersion('cashRegisters')
+async deleteCashRegister(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
+  const deleted = await this.cashRegisterService.delete(id);
+  if (deleted) {
+    this.gateway.server.to(`gym-${deleted.gymId}`).emit('cashRegisterDeleted', { id });
+  }
+  return true;
+}
+
+
+
 }
