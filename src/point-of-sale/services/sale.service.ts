@@ -56,7 +56,7 @@ export class SaleService {
         gym,
         cashRegister,  // Relación con la entidad CashRegister
         cashRegisterId, // Guarda el ID directamente
-        cashierId: 1,   // Puedes ajustarlo si es dinámico
+    cashierId: cashRegister.cashierId, // ✅ Usar el cashierId real de la caja
     });
 
     const saleDetails: SaleDetail[] = [];
