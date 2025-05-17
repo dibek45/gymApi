@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { SaleService } from '../services/sale.service';
 import { Sale } from '../entities/sale.entity';
 import { CartItemInput } from '../dto/cart-item.input';
+import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
 
 @Resolver(() => Sale)
 export class SaleResolver {
@@ -12,6 +13,7 @@ export class SaleResolver {
     return this.saleService.findAllByGymId(gymId);
   }
 
+  @AutoTouchVersion('cashRegisters')
   @Mutation(() => Sale)
   async createSale(
     @Args('gymId', { type: () => Int }) gymId: number, // 🔥 Asegurar que sea Int
