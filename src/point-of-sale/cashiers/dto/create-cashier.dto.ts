@@ -1,5 +1,5 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, IsEmail, MinLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsEmail, MinLength, IsNumber } from 'class-validator';
 
 @InputType()
 export class CreateCashierDto {
@@ -29,5 +29,8 @@ export class CreateCashierDto {
   gymId: number;
 
   @Field({ nullable: true }) // 👈 Esto lo hace opcional
+  
+  @IsOptional()
+  @IsNumber()
   userId?: number;
 }
