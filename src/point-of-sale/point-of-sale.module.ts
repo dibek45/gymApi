@@ -19,6 +19,7 @@ import { SharedModule } from 'src/shared/share.module';
 import { PubSubModule } from './pubsub.module';
 import { UpdateVersionModule } from 'src/update-version/update-version.module';
 import { SocketModule } from 'src/socket.module';
+import { UpdateVersionService } from 'src/update-version/update-version.service';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SocketModule } from 'src/socket.module';
     SocketModule
   ],
   providers: [
+    UpdateVersionService,
     SaleService,
     CashMovementService,
     CashRegisterService,
