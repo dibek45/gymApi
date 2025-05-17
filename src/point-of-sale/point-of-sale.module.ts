@@ -32,7 +32,7 @@ import { UpdateVersionService } from 'src/update-version/update-version.service'
     SocketModule
   ],
   providers: [
-    UpdateVersionService,
+  
     SaleService,
     CashMovementService,
     CashRegisterService,
