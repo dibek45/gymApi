@@ -82,8 +82,16 @@ export class CashRegisterService {
     openingTime: new Date(),
   });
 
-  return this.cashRegisterRepository.save(cashRegister);
-}
+await this.cashRegisterRepository.save(cashRegister);
+
+// 🔁 Recarga la caja con la relación completa del cajero
+return this.cashRegisterRepository.findOne({
+  where: { id: cashRegister.id },
+  relations: {
+    cashier: true, // 🔑 Esto asegura que venga con cashier.userId
+    gym: true      // ✅ También recargas el gym si lo usas en el return
+  }
+});}
   
   async updateBalance(id: number, amount: number): Promise<CashRegister> {
     const cashRegister = await this.findOne(id);

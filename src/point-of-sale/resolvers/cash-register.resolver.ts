@@ -44,19 +44,7 @@ export class CashRegisterResolver {
     const newRegister = await this.cashRegisterService.create(input);
   
     const gymIdFinal = newRegister.gym?.id ?? newRegister.gymId;
-  /*
-    console.log('📣 Publicando cashRegisterUpdated:', {
-      id: newRegister.id,
-      gymId: gymIdFinal,
-    });
-  
-    await this.pubSub.publish('cashRegisterUpdated', {
-      cashRegisterUpdated: {
-        ...newRegister,
-        gymId: gymIdFinal,
-      },
-    });
-  */
+
     // ✅ Este return asegura que el interceptor lo detecte
     console.log('📦 Devolviendo desde la mutación:', {
       ...newRegister,
@@ -81,26 +69,4 @@ async closeCashRegister(@Args('id', { type: () => Int }) id: number) {
   return this.cashRegisterService.close(id);
 }
 
-
-
-
-
-
-
-
-
-
-/*
-
-  @Subscription(() => CashRegister, {
-    filter: (payload, variables) => {
-      console.log('📡 FILTRO', payload.cashRegisterUpdated);
-      return payload.cashRegisterUpdated.gymId === variables.gymId;
-    },    
-  })
-  cashRegisterUpdated(
-    @Args('gymId', { type: () => Int }) gymId: number,
-  ) {
-    return this.pubSub.asyncIterator('cashRegisterUpdated');
-  }*/
 }

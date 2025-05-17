@@ -16,10 +16,10 @@ export class SaleResolver {
   @AutoTouchVersion('cashRegisters')
   @Mutation(() => Sale)
   async createSale(
-    @Args('gymId', { type: () => Int }) gymId: number, // 🔥 Asegurar que sea Int
+    @Args('gymId', { type: () => Int }) gymId: number,
     @Args('paymentMethod') paymentMethod: string,
     @Args('cart', { type: () => [CartItemInput] }) cart: CartItemInput[],
-    @Args('cashRegisterId', { type: () => Int }) cashRegisterId: number // 🔥 También Int
+    @Args('cashRegisterId', { type: () => Int }) cashRegisterId: number 
   ): Promise<Sale> {
     console.log(`🛠️ Recibiendo en GraphQL -> gymId: ${gymId}, cashRegisterId: ${cashRegisterId}`);
     return this.saleService.createSale(gymId, paymentMethod, cart, cashRegisterId);
