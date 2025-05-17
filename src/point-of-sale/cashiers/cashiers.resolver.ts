@@ -27,6 +27,7 @@ export class CashiersResolver {
   @AutoTouchVersion('cashiers')
   @Mutation(() => Cashier)
   async createCashier(@Args('createCashierInput') createCashierInput: CreateCashierDto) {
+    console.log("-------------------------------------------------------------------------------wwwss")
   const newCashier = await this.cashiersService.create(createCashierInput);
   this.socketGateway.emitCashierUpdate(newCashier); // ✅ ya es un Cashier
   return newCashier;
