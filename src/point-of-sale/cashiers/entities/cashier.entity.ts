@@ -51,6 +51,7 @@ export class Cashier {
 @JoinColumn({ name: 'userId' })
 user: OpsTeam;
 
+@Field(() => Int, { nullable: true }) // 👈 ¡ESTO es obligatorio!
 @Column({ nullable: true })
 userId?: number;
 }
