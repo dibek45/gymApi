@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CashRegister } from '../entities/cash-register.entity';
@@ -32,29 +32,58 @@ export class CashRegisterService {
     });
   }
 
-  async create(input: CreateCashRegisterInput): Promise<CashRegister> {
-    // Verificar y cargar el Gym
-    const gym = await this.gymRepository.findOne({ where: { id: input.gymId } });
-    if (!gym) throw new Error(`Gym with id ${input.gymId} not found`);
-  
-    // Verificar y cargar el Cashier
-    const cashier = await this.cashierRepository.findOne({ where: { id: input.cashierId } });
-    if (!cashier) throw new Error(`Cashier with id ${input.cashierId} not found`);
-  
-    // Crear el registro de caja
-    const cashRegister = this.cashRegisterRepository.create({
-      gym, // Asociar el Gym
-      cashier, // Asociar el Cajero
-      cashierId: input.cashierId,
-      openingBalance: input.openingBalance,
-      currentBalance: input.openingBalance,
-      status: 'open',
-      openingTime: new Date(),
-    });
-  
-    // Guardar y devolver el registro
-    return this.cashRegisterRepository.save(cashRegister);
+ async create(input: CreateCashRegisterInput): Promise<CashRegister> {
+  const gym = await this.gymRepository.findOne({ where: { id: input.gymId } });
+  if (!gym) {
+    throw new BadRequestException(`Gym with id ${input.gymId} not found`);
   }
+
+  const cashier = await this.cashierRepository.findOne({ where: { id: input.cashierId } });
+  if (!cashier) {
+    throw new BadRequestException(`Cashier with id ${input.cashierId} not found`);
+  }
+
+  // 🚫 Validación 1: Monto inicial debe ser >= 0
+  if (input.openingBalance < 0) {
+    throw new BadRequestException('Opening balance must be zero or positive.');
+  }
+
+  // 🚫 Validación 2: El cajero no debe tener una caja abierta
+  const existingOpenCashRegister = await this.cashRegisterRepository.findOne({
+    where: {
+      cashier: { id: input.cashierId },
+      status: 'open',
+    },
+  });
+
+  if (existingOpenCashRegister) {
+    throw new BadRequestException(`Cashier with id ${input.cashierId} already has an open cash register.`);
+  }
+
+  // 🚫 Validación 3: No más de 4 cajas abiertas por gimnasio
+  const openRegistersInGym = await this.cashRegisterRepository.count({
+    where: {
+      gym: { id: input.gymId },
+      status: 'open',
+    },
+  });
+
+  if (openRegistersInGym >= 4) {
+    throw new BadRequestException(`Gym with id ${input.gymId} already has 4 open cash registers.`);
+  }
+
+  const cashRegister = this.cashRegisterRepository.create({
+    gym,
+    cashier,
+    cashierId: input.cashierId,
+    openingBalance: input.openingBalance,
+    currentBalance: input.openingBalance,
+    status: 'open',
+    openingTime: new Date(),
+  });
+
+  return this.cashRegisterRepository.save(cashRegister);
+}
   
   async updateBalance(id: number, amount: number): Promise<CashRegister> {
     const cashRegister = await this.findOne(id);
@@ -64,9 +93,32 @@ export class CashRegisterService {
 
 
   async findByGym(gymId: number): Promise<CashRegister[]> {
-    return this.cashRegisterRepository.find({
-      relations: ['movements', 'gym'], // Asegúrate de incluir relaciones necesarias
-       });
+  return this.cashRegisterRepository.find({
+    where: {
+      gym: { id: gymId },
+    },
+    relations: ['movements', 'gym'],
+  });
+}
+
+
+async close(id: number): Promise<CashRegister> {
+  const cashRegister = await this.cashRegisterRepository.findOne({ where: { id } });
+
+  if (!cashRegister) {
+    throw new BadRequestException(`Cash register with id ${id} not found`);
   }
+
+  if (cashRegister.status === 'closed') {
+    throw new BadRequestException(`Cash register with id ${id} is already closed`);
+  }
+
+  cashRegister.status = 'closed';
+  cashRegister.closingTime = new Date();
+  // Si deseas guardar el balance final de forma explícita:
+  cashRegister.closingBalance = cashRegister.currentBalance;
+
+  return this.cashRegisterRepository.save(cashRegister);
+}
 
 }

@@ -60,4 +60,8 @@
     @OneToMany(() => Sale, (sale) => sale.cashRegister)
     @Field(() => [Sale], { nullable: true }) // Exponer en GraphQL
     sales?: Sale[];
+    closingTime: Date;
+    closingBalance: number;
+
+    
   }

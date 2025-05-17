@@ -75,7 +75,11 @@ this.gateway.server.to(`gym-${newRegister.gymId}`).emit('cashRegisterUpdated', {
   }
   
 
-
+@AutoTouchVersion('cashRegisters')
+@Mutation(() => CashRegister)
+async closeCashRegister(@Args('id', { type: () => Int }) id: number) {
+  return this.cashRegisterService.close(id);
+}
 
 
 
