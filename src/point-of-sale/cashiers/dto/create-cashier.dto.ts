@@ -27,4 +27,7 @@ export class CreateCashierDto {
   @Field(() => Int)
   @IsNotEmpty()
   gymId: number;
+
+  @Field({ nullable: true }) // 👈 Esto lo hace opcional
+  userId?: number;
 }
