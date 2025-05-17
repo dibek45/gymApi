@@ -2,6 +2,7 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { CashRegister } from '../../entities/cash-register.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from 'src/user/user.entity';
+import { OpsTeam } from 'src/rol/entities/ops-team.entity';
 
 @ObjectType()
 @Entity('cashiers')
@@ -46,13 +47,12 @@ export class Cashier {
   @Field(() => [CashRegister])
   cashRegisters: CashRegister[];
 
-  @Field()
-  @Column({ nullable: true })
-  userId?: number;
-
-  @ManyToOne(() => User, user => user.cashiers, { nullable: true })
+ @ManyToOne(() => OpsTeam)
 @JoinColumn({ name: 'userId' })
-user?: User;
+user: OpsTeam;
+
+@Column({ nullable: true })
+userId?: number;
 }
 
 
