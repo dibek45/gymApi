@@ -4,9 +4,10 @@ import { CashiersResolver } from './cashiers.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cashier } from './entities/cashier.entity';
 import { AppGateway } from 'src/app.gateway';
+import { User } from 'src/user/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Cashier])], // Registro del repositorio Gym
+  imports: [TypeOrmModule.forFeature([Cashier,User])], // Registro del repositorio Gym
   providers: [CashiersResolver, CashiersService,AppGateway]
 })
 export class CashiersModule {}

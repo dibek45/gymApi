@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Cashier } from 'src/point-of-sale/cashiers/entities/cashier.entity';
 
 @ObjectType()
 @Entity()
@@ -49,4 +50,9 @@ export class User {
   password: string;
 
   qrCodes: any;
+
+  // user.entity.ts
+@OneToMany(() => Cashier, cashier => cashier.user)
+cashiers: Cashier[];
+
 }
