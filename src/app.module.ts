@@ -30,6 +30,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { UpdateVersionModule } from './update-version/update-version.module';
 import { APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptors/auto-touch-version.interceptor';
+import { ExpenseModule } from './exponse/exponse.module';
 
 @Module({
   imports: 
@@ -45,6 +46,7 @@ import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptor
             UserModule,
             QRCodeModule,
             ProductModule,
+            ExpenseModule,
             GraphQLModule.forRoot<ApolloDriverConfig>({
               driver: ApolloDriver,
               playground: false, // this line is the only change in your code

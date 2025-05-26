@@ -9,6 +9,7 @@ import { Promotion } from './../promotions/promotion.entity';
 import { Routine } from './../routines/routines.entity';
 import { ExerciseType } from './../routines/exercise-type.entity';
 import { Plan } from '../plan/plan.entity';
+import { Expense } from 'src/exponse/exponse.entity';
 
 @Entity()
 @ObjectType()
@@ -54,4 +55,7 @@ exerciseTypes?: ExerciseType[];
 @OneToMany(() => Plan, (plan) => plan.gym) // Relación con Plan
 @Field(() => [Plan], { nullable: true })
 plans?: Plan[];
+
+  @OneToMany(() => Expense, (expense) => expense.gym)
+  expenses: Expense[];
 }
