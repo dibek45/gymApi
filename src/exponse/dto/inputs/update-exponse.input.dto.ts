@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
   IsDateString,
+  IsDate,
 } from 'class-validator';
 
 @InputType()
@@ -32,10 +33,12 @@ export class UpdateExpenseInput {
   @IsOptional()
   paymentMethod?: string;
 
-  @Field(() => String, { nullable: true })
-  @IsDateString()
+  @Field(() => Date)
+@IsDate()
   @IsOptional()
-  expenseDate?: string;
+  expenseDate?: Date;
+
+
 
   @Field(() => String, { nullable: true })
   @IsString()
