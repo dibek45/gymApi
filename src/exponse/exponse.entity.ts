@@ -11,7 +11,7 @@ import { Gym } from '../gym/gym.entity';
 import { Cashier } from 'src/point-of-sale/cashiers/entities/cashier.entity';
 
 @ObjectType()
-@Entity()
+@Entity('expenses') // 👈 ahora se alinea con el nombre real
 export class Expense {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
