@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsDateString,
   MaxLength,
+  IsDate,
 } from 'class-validator';
 
 @InputType()
@@ -23,9 +24,10 @@ export class CreateExpenseInput {
   @IsString()
   paymentMethod: string;
 
-  @Field()
-  @IsDateString()
-  expenseDate: string;
+  @Field(() => Date)
+  @IsDate()
+  expenseDate: Date;
+
 
   @Field()
   @IsString()
