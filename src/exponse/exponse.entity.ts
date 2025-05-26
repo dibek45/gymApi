@@ -30,8 +30,9 @@ export class Expense {
   paymentMethod: string;
 
   @Column({ type: 'timestamp' })
-  @Field()
-  expenseDate: Date;
+  @Field(() => Date)
+expenseDate: Date;
+
 
   @Column()
   @Field()
@@ -60,12 +61,13 @@ export class Expense {
   
 
   @CreateDateColumn()
-  @Field()
+  @Field(() => Date)
   createdAt: Date;
 
   @UpdateDateColumn()
-  @Field()
+  @Field(() => Date)
   updatedAt: Date;
+
 
   @Column({ default: false })
   @Field({ nullable: true })
