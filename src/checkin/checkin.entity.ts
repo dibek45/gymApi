@@ -2,50 +2,49 @@ import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('checkins') // aquí defines explícitamente el nombre de la tabla
+@Entity('checkins')
 export class Checkin {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number;
 
-  @Column()
+  @Column({ name: 'member_id', type: 'int' })
   @Field(() => Int)
   memberId: number;
 
-  @Column()
+  @Column({ name: 'gym_id', type: 'int' })
   @Field(() => Int)
   gymId: number;
 
-  @Column()
+  @Column({ name: 'checkin_date', type: 'varchar' })
   @Field()
   checkinDate: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   @Field()
   timestamp: string;
 
-  @Column()
+  @Column({ name: 'created_by', type: 'varchar' })
   @Field()
   createdBy: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   @Field({ nullable: true })
   createdAt?: string;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   @Field({ nullable: true })
   updatedAt?: string;
 
-  @Column({ default: false })
+  @Column({ name: 'is_synced', type: 'boolean', default: false })
   @Field(() => Boolean, { nullable: true })
   isSynced?: boolean;
 
-  @Column({ default: false })
+  @Column({ name: 'sync_error', type: 'boolean', default: false })
   @Field(() => Boolean, { nullable: true })
   syncError?: boolean;
 
-  @Column({ nullable: true })
+  @Column({ name: 'temp_id', type: 'varchar', nullable: true })
   @Field({ nullable: true })
   tempId?: string;
 }
-
