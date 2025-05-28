@@ -1,5 +1,5 @@
-import { Field, InputType, Int, ID } from '@nestjs/graphql';
-import { IsNotEmpty, IsString, IsNumber, IsOptional, IsDateString } from 'class-validator';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateCheckinInput {
@@ -25,4 +25,10 @@ export class CreateCheckinInput {
   @IsString()
   @IsOptional()
   tempId?: string;
+
+  // ✅ Campo que falta
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  checkinDate: string;
 }
