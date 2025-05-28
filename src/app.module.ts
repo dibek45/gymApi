@@ -54,9 +54,6 @@ import { CheckinModule } from './checkin/checkin.module';
               driver: ApolloDriver,
               playground: false, // this line is the only change in your code
              
-            
-              
-              
               plugins: [
                 process.env.NODE_ENV === 'production'
                   ? ApolloServerPluginLandingPageProductionDefault()
