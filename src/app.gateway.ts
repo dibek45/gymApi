@@ -82,6 +82,37 @@ emitCashierDeleted(cashierId: number, gymId: number) {
   this.server.to(`gym-${gymId}`).emit('cashierDeleted', { id: cashierId });
 }
 
+
+emitCheckinUpdate(checkin: any) {
+  const room = `gym-${checkin.gymId}`;
+  this.logger.log(`📤 Enviando checkinUpdated a sala: ${room}`);
+  this.server.to(room).emit('checkinUpdated', checkin);
+}
+
+@SubscribeMessage('newCheckin')
+handleNewCheckin(@MessageBody() checkin: any) {
+  const room = `gym-${checkin.gymId}`;
+  this.logger.log(`🟢 Checkin recibido por socket para gym ${room}:`, checkin);
+  this.server.to(room).emit('checkinUpdated', checkin);
+}
+
+emitExpenseUpdate(expense: any) {
+  const room = `gym-${expense.gymId}`;
+  this.logger.log(`📤 Enviando expenseUpdated a sala: ${room}`);
+  this.server.to(room).emit('expenseUpdated', expense);
+}
+emitExpenseDeleted(expenseId: number, gymId: number) {
+  this.server.to(`gym-${gymId}`).emit('expenseDeleted', { id: expenseId });
+}
+
+
+@SubscribeMessage('newExpense')
+handleNewExpense(@MessageBody() expense: any) {
+  const room = `gym-${expense.gymId}`;
+  this.logger.log(`🟢 Gasto recibido por socket para gym ${room}:`, expense);
+  this.server.to(room).emit('expenseUpdated', expense);
+}
+
   }
   
   

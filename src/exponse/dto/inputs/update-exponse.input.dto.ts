@@ -38,8 +38,6 @@ export class UpdateExpenseInput {
   @IsOptional()
   expenseDate?: Date;
 
-
-
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()

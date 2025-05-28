@@ -31,6 +31,7 @@ import { UpdateVersionModule } from './update-version/update-version.module';
 import { APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { AutoTouchVersionGraphQLInterceptor } from './update-version/interceptors/auto-touch-version.interceptor';
 import { ExpenseModule } from './exponse/exponse.module';
+import { CheckinModule } from './checkin/checkin.module';
 
 @Module({
   imports: 
@@ -47,6 +48,8 @@ import { ExpenseModule } from './exponse/exponse.module';
             QRCodeModule,
             ProductModule,
             ExpenseModule,
+              CheckinModule, // ✅ Agrega este
+
             GraphQLModule.forRoot<ApolloDriverConfig>({
               driver: ApolloDriver,
               playground: false, // this line is the only change in your code

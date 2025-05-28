@@ -18,7 +18,6 @@ export class ProductService {
     @InjectRepository(Product) private readonly productRepository: Repository<Product>,       
      private _saveImage:ImageService,
 
-    private readonly websocketsGateway: WebsocketsGateway
   ) {}
 
   async create(data: CreateProduct): Promise<Product> {
