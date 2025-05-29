@@ -93,11 +93,18 @@ return this.cashRegisterRepository.findOne({
   }
 });}
   
-  async updateBalance(id: number, amount: number): Promise<CashRegister> {
-    const cashRegister = await this.findOne(id);
-    cashRegister.currentBalance += amount;
-    return this.cashRegisterRepository.save(cashRegister);
+async updateBalance(id: number, amount: number): Promise<CashRegister> {
+  const cashRegister = await this.findOne(id);
+
+  const parsedAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+
+  if (isNaN(parsedAmount)) {
+    throw new Error(`El monto recibido no es un número válido: ${amount}`);
   }
+
+  cashRegister.currentBalance += parsedAmount;
+  return this.cashRegisterRepository.save(cashRegister);
+}
 
 
   async findByGym(gymId: number): Promise<CashRegister[]> {

@@ -12,7 +12,7 @@ export class ExpenseService {
   constructor(
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
-    private readonly gateway: AppGateway, // ← aquí
+    private readonly gateway: AppGateway, 
   private readonly cashRegisterService: CashRegisterService, // ✅
 
 
