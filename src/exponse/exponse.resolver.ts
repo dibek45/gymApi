@@ -30,6 +30,7 @@ export class ExpenseResolver {
   }
 
   @AutoTouchVersion('expenses')
+  @AutoTouchVersion('cashRegisters')
   @Mutation(() => Expense, { name: "createExpense" })
   async createInput(@Args('createExpense') createExpense: CreateExpenseInput) {
         this._socketService.emitExpenseUpdate(createExpense); // 🔄 emitimos a clientes

@@ -101,6 +101,8 @@ emitExpenseUpdate(expense: any) {
   this.logger.log(`📤 Enviando expenseUpdated a sala: ${room}`);
   this.server.to(room).emit('expenseUpdated', expense);
 }
+
+
 emitExpenseDeleted(expenseId: number, gymId: number) {
   this.server.to(`gym-${gymId}`).emit('expenseDeleted', { id: expenseId });
 }
@@ -111,6 +113,12 @@ handleNewExpense(@MessageBody() expense: any) {
   const room = `gym-${expense.gymId}`;
   this.logger.log(`🟢 Gasto recibido por socket para gym ${room}:`, expense);
   this.server.to(room).emit('expenseUpdated', expense);
+}
+
+emitCashRegisterUpdate(cashRegister: CashRegister) {
+  const room = `gym-${cashRegister.gymId}`;
+  this.logger.log(`📤 Enviando cashRegisterUpdated a sala: ${room}`);
+  this.server.to(room).emit('cashRegisterUpdated', cashRegister);
 }
 
   }

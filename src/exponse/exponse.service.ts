@@ -4,12 +4,18 @@ import { Repository } from 'typeorm';
 import { CreateExpenseInput } from './dto/inputs/create-exponse-input.dto';
 import { UpdateExpenseInput } from './dto/inputs/update-exponse.input.dto';
 import { Expense } from './exponse.entity';
+import { AppGateway } from 'src/app.gateway';
+import { CashRegisterService } from 'src/point-of-sale/services/cash-register.service';
 
 @Injectable()
 export class ExpenseService {
   constructor(
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
+    private readonly gateway: AppGateway, // ← aquí
+  private readonly cashRegisterService: CashRegisterService, // ✅
+
+
   ) {}
 
   findAll(): Promise<Expense[]> {
@@ -26,7 +32,11 @@ export class ExpenseService {
 
   async create(createExpense: CreateExpenseInput): Promise<Expense> {
     const newExpense = this.expenseRepository.create(createExpense);
+      const updatedCashRegister = await this.cashRegisterService.updateBalance(createExpense.cashierId, -createExpense.amount);
+  this.gateway.emitCashRegisterUpdate(updatedCashRegister);
+
     return this.expenseRepository.save(newExpense);
+    
   }
 
   async update(updateExpense: UpdateExpenseInput): Promise<Expense> {
