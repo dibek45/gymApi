@@ -31,10 +31,16 @@ export class ExpenseService {
   }
 
   async create(createExpense: CreateExpenseInput): Promise<Expense> {
-    const amount = Number(createExpense.amount);
 
     const newExpense = this.expenseRepository.create(createExpense);
-      const updatedCashRegister = await this.cashRegisterService.updateBalance(createExpense.cashierId, -amount);
+    const amount = Number(createExpense.amount);
+if (isNaN(amount)) throw new Error('Monto inválido');
+
+const updatedCashRegister = await this.cashRegisterService.updateBalance(
+  createExpense.cashierId,
+  -amount
+);
+
   this.gateway.emitCashRegisterUpdate(updatedCashRegister);
 
     return this.expenseRepository.save(newExpense);
