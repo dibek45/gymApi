@@ -41,6 +41,6 @@ import { UpdateVersionService } from 'src/update-version/update-version.service'
     CashRegisterResolver,
     Cashier
   ],
-  exports: [SaleService, CashMovementService],
+  exports: [SaleService, CashMovementService,CashRegisterService],
 })
 export class PointOfSaleModule {}
