@@ -102,6 +102,7 @@ async updateBalance(id: number, amount: number): Promise<CashRegister> {
   if (isNaN(parsedAmount)) {
     throw new Error(`El monto recibido no es un número válido: ${amount}`);
   }
+cashRegister.currentBalance = parseFloat(cashRegister.currentBalance as any) + amount;
 
   cashRegister.currentBalance += parsedAmount;
   return this.cashRegisterRepository.save(cashRegister);
