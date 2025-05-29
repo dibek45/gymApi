@@ -97,6 +97,7 @@ async updateBalance(id: number, amount: number): Promise<CashRegister> {
   const cashRegister = await this.findOne(id);
 
   const parsedAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  console.log('📊-+-+-+-+-+-+-+-+-+-++-----+-- Dentro de updateBalance, amount:', amount, 'Tipo:', typeof amount);
 
   if (isNaN(parsedAmount)) {
     throw new Error(`El monto recibido no es un número válido: ${amount}`);

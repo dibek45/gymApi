@@ -35,6 +35,7 @@ export class ExpenseService {
     const newExpense = this.expenseRepository.create(createExpense);
     const amount = Number(createExpense.amount);
 if (isNaN(amount)) throw new Error('Monto inválido');
+console.log('🧮 Actualizando caja con amount:', -createExpense.amount, 'Tipo:', typeof createExpense.amount);
 
 const updatedCashRegister = await this.cashRegisterService.updateBalance(
   createExpense.cashierId,
