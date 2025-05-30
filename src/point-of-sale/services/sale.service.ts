@@ -23,140 +23,121 @@ export class SaleService {
     @InjectRepository(CashMovement) private cashMovementRepository: Repository<CashMovement>,
     private readonly userService: UserService,
   ) {}
-  async createSale(
-    gymId: number,
-    paymentMethod: string,
-    cart: CartItemInput[],
-    cashRegisterId: number
+async createSale(
+  gymId: number,
+  paymentMethod: string,
+  cart: CartItemInput[],
+  cashRegisterId: number
 ): Promise<Sale> {
-    console.log(`🔹 Iniciando proceso de venta para gymId: ${gymId}`);
-    console.log(`📌 Datos recibidos desde el frontend:`, JSON.stringify(cart, null, 2));
+  console.log(`🔹 Iniciando proceso de venta con transacción...`);
 
-    // Verificar si el gimnasio existe
-    const gym = await this.gymRepository.findOne({ where: { id: gymId } });
-    if (!gym) {
-        throw new Error(`❌ Gym con id ${gymId} no encontrado`);
-    }
-    console.log(`✅ Gimnasio encontrado: ${gym.id}`);
+  return await this.saleRepository.manager.transaction(async manager => {
+    // Verificar gimnasio
+    const gym = await manager.findOne(Gym, { where: { id: gymId } });
+    if (!gym) throw new Error(`❌ Gym con id ${gymId} no encontrado`);
 
-    // Verificar si la caja registradora existe
-    const cashRegister = await this.cashRegisterRepository.findOne({
-        where: { id: cashRegisterId }
-    });
-    if (!cashRegister) {
-        throw new Error(`❌ Caja registradora con id ${cashRegisterId} no encontrada`);
-    }
-    console.log(`✅ Caja registradora encontrada: ${cashRegister.id}`);
+    // Verificar caja
+    const cashRegister = await manager.findOne(CashRegister, { where: { id: cashRegisterId } });
+    if (!cashRegister) throw new Error(`❌ Caja con id ${cashRegisterId} no encontrada`);
 
     let totalAmount = 0;
-    
-    // Crear la venta con la caja registradora asociada
-    const sale = this.saleRepository.create({
-        paymentMethod,
-        gym,
-        cashRegister,  // Relación con la entidad CashRegister
-        cashRegisterId, // Guarda el ID directamente
-    cashierId: cashRegister.cashierId, // ✅ Usar el cashierId real de la caja
+
+    const sale = manager.create(Sale, {
+      paymentMethod,
+      gym,
+      cashRegister,
+      cashRegisterId,
+      cashierId: cashRegister.cashierId,
     });
 
     const saleDetails: SaleDetail[] = [];
 
     for (const item of cart) {
-        let saleDetail;
-        if (item.isMembership) {
-            saleDetail = await this.processMembership(item, sale, paymentMethod);
-        } else {
-            saleDetail = await this.processProductSale(item, sale);
-        }
+      let detail: SaleDetail;
 
-        if (saleDetail) {
-            saleDetails.push(saleDetail);
-            totalAmount += saleDetail.totalPrice;
-        }
+      if (item.isMembership) {
+        detail = await this.processMembership(item, sale, paymentMethod, manager);
+      } else {
+        detail = await this.processProductSale(item, sale, manager);
+      }
+
+      if (detail) {
+        saleDetails.push(detail);
+        totalAmount += detail.totalPrice;
+      }
     }
 
     sale.details = saleDetails;
     sale.totalAmount = parseFloat(totalAmount.toFixed(2));
 
-    console.log(`💰 Total calculado: ${sale.totalAmount}`);
-
-    // Si el pago es en efectivo, actualizar la caja registradora
+    // ✅ Si pago es en efectivo, actualiza balance en la misma transacción
     if (paymentMethod.toLowerCase() === 'efectivo') {
-        await this.updateCashRegister(sale, totalAmount);
+      const currentBalance = Number(cashRegister.currentBalance);
+      cashRegister.currentBalance = currentBalance + totalAmount;
+      await manager.save(cashRegister);
     }
 
-    await this.saleRepository.save(sale);
-    console.log(`✅ Venta guardada con ID: ${sale.id}`);
-// 🔄 ACTUALIZACIÓN DE VERSIÓN LOCAL SEGÚN EL TIPO DE ITEMS
+    await manager.save(sale);
+    console.log(`✅ Venta y caja guardadas en una sola transacción`);
+
+    // 🔄 Versiones para sincronización
     const hayProductos = cart.some(item => !item.isMembership);
     const hayMembresias = cart.some(item => item.isMembership);
 
     if (hayProductos) {
-  await this.pubSubService.touchVersion(gymId, 'products');
+      await this.pubSubService.touchVersion(gymId, 'products');
     }
 
     if (hayMembresias) {
-      await this.pubSubService.touchVersion(gym.id, 'members');
+      await this.pubSubService.touchVersion(gymId, 'members');
     }
 
     return sale;
+  });
 }
 
 
 
-private async processMembership(item: CartItemInput, sale: Sale, paymentMethod: string): Promise<SaleDetail> {
+
+private async processMembership(
+  item: CartItemInput,
+  sale: Sale,
+  paymentMethod: string,
+  manager: any
+): Promise<SaleDetail> {
   console.log(`🔹 Procesando membresía para el item: ${item.name}`);
 
   const daysToAdd = this.getMembershipDays(item.productId);
 
   if (item.idClienteTOMembership) {
-      await this.userService.updateAvailableDays({
-          id: item.idClienteTOMembership,
-          available_days: daysToAdd,
-      });
-      console.log(`✅ updateAvailableDays llamado para userId=${item.idClienteTOMembership} con ${daysToAdd} días.`);
+    await this.userService.updateAvailableDays({
+      id: item.idClienteTOMembership,
+      available_days: daysToAdd,
+    });
+    console.log(`✅ updateAvailableDays llamado para userId=${item.idClienteTOMembership} con ${daysToAdd} días.`);
   } else {
-      console.warn(`❌ No se encontró 'idClienteTOMembership' en el item.`);
+    console.warn(`❌ No se encontró 'idClienteTOMembership' en el item.`);
   }
-  console.log("item----------------------------")
 
-console.log(item)
-  const saleDetail = new SaleDetail();
-  saleDetail.sale = sale;
-  saleDetail.product = null;  // ✅ No tiene `product`, porque es una membresía
-  saleDetail.membershipName = item.name;  
-  saleDetail.isMembership = true; 
-  saleDetail.quantity = 1;
-  console.log("aqui")
-  console.log(item)
-
-  saleDetail.unitPrice = item.costo;
-  saleDetail.totalPrice = parseFloat(item.costo.toFixed(2));
+  const saleDetail = manager.create(SaleDetail, {
+    sale,
+    product: null,
+    membershipName: item.name,
+    isMembership: true,
+    quantity: 1,
+    unitPrice: item.costo,
+    totalPrice: parseFloat(item.costo.toFixed(2)),
+  });
 
   console.log(`📌 Intentando insertar SaleDetail en la base de datos:`, JSON.stringify(saleDetail, null, 2));
 
   try {
-      // 🔥 Forzar `INSERT` en lugar de `UPDATE`
-      await this.saleRepository.manager
-          .createQueryBuilder()
-          .insert()
-          .into(SaleDetail)
-          .values({
-              sale: saleDetail.sale,
-              product: saleDetail.product,
-              membershipName: saleDetail.membershipName,
-              isMembership: saleDetail.isMembership,
-              quantity: saleDetail.quantity,
-              unitPrice: saleDetail.unitPrice,
-              totalPrice: saleDetail.totalPrice,
-          })
-          .execute();
-
-      console.log(`✅ SaleDetail insertado correctamente.`);
-      return saleDetail;
+    await manager.insert(SaleDetail, saleDetail);
+    console.log(`✅ SaleDetail insertado correctamente.`);
+    return saleDetail;
   } catch (error) {
-      console.error(`❌ Error guardando SaleDetail:`, error);
-      throw new Error(`Error guardando el detalle de la venta para la membresía.`);
+    console.error(`❌ Error guardando SaleDetail:`, error);
+    throw new Error(`Error guardando el detalle de la venta para la membresía.`);
   }
 }
 
@@ -165,30 +146,33 @@ console.log(item)
 
 
   /** ✅ Procesa la venta de un producto */
-  private async processProductSale(item: CartItemInput, sale: Sale): Promise<SaleDetail> {
-    console.log(`🔹//////////////////////////////////// Procesando producto con ID: ${item.productId}`);
+  private async processProductSale(item: CartItemInput, sale: Sale, manager: any): Promise<SaleDetail> {
+  console.log(`🔹 Procesando producto con ID: ${item.productId}`);
 
-    const product = await this.productRepository.findOne({ where: { id: item.productId } });
-    if (!product) {
-      throw new Error(`❌ Producto con id ${item.productId} no encontrado`);
-    }
-
-    if (product.stock < item.quantity) {
-      throw new Error(`❌ Stock insuficiente para producto con id ${item.productId}`);
-    }
-
-    product.stock -= item.quantity;
-    await this.productRepository.save(product);
-    console.log(`✅ Stock actualizado para producto ${product.id}. Nuevo stock: ${product.stock}`);
-
-    const saleDetail = new SaleDetail();
-    saleDetail.product = product;
-    saleDetail.quantity = item.quantity;
-    saleDetail.unitPrice = product.price;
-    saleDetail.totalPrice = parseFloat((item.quantity * product.price).toFixed(2));
-
-    return saleDetail;
+  const product = await manager.findOne(Product, { where: { id: item.productId } });
+  if (!product) {
+    throw new Error(`❌ Producto con id ${item.productId} no encontrado`);
   }
+
+  if (product.stock < item.quantity) {
+    throw new Error(`❌ Stock insuficiente para producto con id ${item.productId}`);
+  }
+
+  product.stock -= item.quantity;
+  await manager.save(product);
+  console.log(`✅ Stock actualizado para producto ${product.id}. Nuevo stock: ${product.stock}`);
+
+  const saleDetail = manager.create(SaleDetail, {
+    sale,
+    product,
+    quantity: item.quantity,
+    unitPrice: product.price,
+    totalPrice: parseFloat((item.quantity * product.price).toFixed(2)),
+  });
+
+  return saleDetail;
+}
+
 
   private async updateCashRegister(sale: Sale, amount: number): Promise<void> {
     console.log(`🔹 Actualizando caja registradora con +${amount}...`);

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
 import { UpdateUser,CreateUser } from './dto';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WebsocketsGateway } from 'src/socket/gateway';
 import { UpdateAvailableDaysDto, UpdateFingerPrintUserByID } from './dto/inputs/update-user.input.dto';
@@ -118,8 +118,10 @@ export class UserService {
     return     true
 }
 
-
-async updateAvailableDays(updateData: { id: number, available_days: number }): Promise<User> {
+async updateAvailableDays(
+  updateData: { id: number, available_days: number },
+  manager?: EntityManager
+): Promise<User> {
   console.log(`📌 Actualizando días disponibles para userId=${updateData.id} con ${updateData.available_days} días.`);
 
   if (!updateData.id || updateData.available_days == null) {
@@ -127,14 +129,16 @@ async updateAvailableDays(updateData: { id: number, available_days: number }): P
     throw new Error('Datos inválidos');
   }
 
-  await this.userRepository.createQueryBuilder()
+  const repo = manager ? manager.getRepository(User) : this.userRepository;
+
+  await repo.createQueryBuilder()
     .update(User)
     .set({ available_days: () => `available_days + ${updateData.available_days}` })
     .where("id = :id", { id: updateData.id })
     .execute();
 
-  // ✅ Retornar el usuario actualizado completo
-  return this.userRepository.findOneBy({ id: updateData.id });
+  return repo.findOneBy({ id: updateData.id });
 }
+
 
 }
