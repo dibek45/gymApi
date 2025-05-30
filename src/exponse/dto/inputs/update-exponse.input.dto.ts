@@ -57,4 +57,9 @@ export class UpdateExpenseInput {
   @IsNumber()
   @IsOptional()
   gymId?: number;
+
+  
+    @Field({ nullable: true })
+      @IsNumber()
+    cashRegisterId?: number;
 }

@@ -44,4 +44,9 @@ export class CreateExpenseInput {
   @Field(() => Int)
   @IsNumber()
   gymId: number;
+
+
+    @Field({ nullable: true })
+      @IsNumber()
+    cashRegisterId?: number;
 }
