@@ -77,11 +77,19 @@ async createSale(
     sale.totalAmount = parseFloat(totalAmount.toFixed(2));
 
     // ✅ Si pago es en efectivo, actualiza balance en la misma transacción
-    if (paymentMethod.toLowerCase() === 'efectivo') {
-      const currentBalance = Number(cashRegister.currentBalance);
-      cashRegister.currentBalance = currentBalance + totalAmount;
-      await manager.save(cashRegister);
-    }
+   // ✅ Si pago es en efectivo, actualiza balance en la misma transacción
+if (paymentMethod.toLowerCase() === 'efectivo') {
+  const currentBalance = Number(cashRegister.currentBalance);
+  const nuevoBalance = currentBalance + totalAmount;
+
+  if (nuevoBalance !== currentBalance) {
+    cashRegister.currentBalance = nuevoBalance;
+    await manager.save(cashRegister); // ✅ solo si hay cambio real
+  } else {
+    console.warn('⚠️ El balance no cambió. Se omite el guardado de caja.');
+  }
+}
+
 
     await manager.save(sale);
     console.log(`✅ Venta y caja guardadas en una sola transacción`);
