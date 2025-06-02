@@ -222,8 +222,7 @@ private async processMembership(
       case 3: return 30; // Plan Mensual
       case 4: return 365;// Plan Anual
       default:
-default:
-  throw new Error(`❌ No se definieron días para la membresía con id ${productId}`);
+        console.warn(`⚠️ No se ha definido mapeo de días para el plan con id ${productId}.`);
         return 0;
     }
   }
