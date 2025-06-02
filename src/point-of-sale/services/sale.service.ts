@@ -73,7 +73,11 @@ async createSale(
       }
     }
 
-    sale.details = saleDetails;
+    if (saleDetails.length > 0) {
+      for (const detail of saleDetails) {
+        await manager.save(SaleDetail, detail); // guardar manualmente cada detalle
+      }
+    }
     sale.totalAmount = parseFloat(totalAmount.toFixed(2));
 
     // ✅ Si pago es en efectivo, actualiza balance en la misma transacción
