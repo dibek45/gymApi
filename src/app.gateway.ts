@@ -63,7 +63,7 @@ handleJoinGym(@MessageBody() gymId: string | number, @ConnectedSocket() client: 
 }
 
 
-
+//aaa
 
   // ✅ Producto actualizado
   emitProductUpdate(product: Product) {
