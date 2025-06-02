@@ -32,11 +32,9 @@ async createSale(
   console.log(`🔹 Iniciando proceso de venta con transacción...`);
 
   return await this.saleRepository.manager.transaction(async manager => {
-    // Verificar gimnasio
     const gym = await manager.findOne(Gym, { where: { id: gymId } });
     if (!gym) throw new Error(`❌ Gym con id ${gymId} no encontrado`);
 
-    // Verificar caja
     const cashRegister = await manager.findOne(CashRegister, { where: { id: cashRegisterId } });
     if (!cashRegister) throw new Error(`❌ Caja con id ${cashRegisterId} no encontrada`);
 
@@ -50,22 +48,12 @@ async createSale(
       cashierId: cashRegister.cashierId,
     });
 
-
-
-
-
-
-
     const saleDetails: SaleDetail[] = [];
 
     for (const item of cart) {
-      let detail: SaleDetail;
-
-      if (item.isMembership) {
-        detail = await this.processMembership(item, sale, paymentMethod, manager);
-      } else {
-        detail = await this.processProductSale(item, sale, manager);
-      }
+      const detail = item.isMembership
+        ? await this.processMembership(item, sale, paymentMethod, manager)
+        : await this.processProductSale(item, sale, manager);
 
       if (detail) {
         saleDetails.push(detail);
@@ -73,46 +61,42 @@ async createSale(
       }
     }
 
+    sale.totalAmount = parseFloat(totalAmount.toFixed(2));
+    await manager.save(sale); // ✅ primero guarda venta con ID válida
+
     if (saleDetails.length > 0) {
       for (const detail of saleDetails) {
-        await manager.save(SaleDetail, detail); // guardar manualmente cada detalle
+        detail.sale = sale;
+        await manager.save(SaleDetail, detail);
       }
     }
-    sale.totalAmount = parseFloat(totalAmount.toFixed(2));
 
-    // ✅ Si pago es en efectivo, actualiza balance en la misma transacción
-   // ✅ Si pago es en efectivo, actualiza balance en la misma transacción
-if (paymentMethod.toLowerCase() === 'efectivo') {
-  const currentBalance = Number(cashRegister.currentBalance);
-  const nuevoBalance = currentBalance + totalAmount;
+    if (paymentMethod.toLowerCase() === 'efectivo') {
+      const currentBalance = Number(cashRegister.currentBalance);
+      const nuevoBalance = currentBalance + totalAmount;
 
-  if (nuevoBalance !== currentBalance) {
-    cashRegister.currentBalance = nuevoBalance;
-    await manager.save(cashRegister); // ✅ solo si hay cambio real
-  } else {
-    console.warn('⚠️ El balance no cambió. Se omite el guardado de caja.');
-  }
-}
+      if (nuevoBalance !== currentBalance) {
+        cashRegister.currentBalance = nuevoBalance;
+        await manager.save(cashRegister);
+      } else {
+        console.warn('⚠️ El balance no cambió. Se omite el guardado de caja.');
+      }
+    }
 
-
-    await manager.save(sale);
     console.log(`✅ Venta y caja guardadas en una sola transacción`);
 
-    // 🔄 Versiones para sincronización
-    const hayProductos = cart.some(item => !item.isMembership);
-    const hayMembresias = cart.some(item => item.isMembership);
-
-    if (hayProductos) {
+    if (cart.some(item => !item.isMembership)) {
       await this.pubSubService.touchVersion(gymId, 'products');
     }
 
-    if (hayMembresias) {
+    if (cart.some(item => item.isMembership)) {
       await this.pubSubService.touchVersion(gymId, 'members');
     }
 
     return sale;
   });
 }
+
 
 
 
