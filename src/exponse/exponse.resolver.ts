@@ -30,13 +30,14 @@ export class ExpenseResolver {
   }
 
   @AutoTouchVersion('expenses')
-  @AutoTouchVersion('cashRegisters')
-  @Mutation(() => Expense, { name: "createExpense" })
-  async createInput(@Args('createExpense') createExpense: CreateExpenseInput) {
-        this._socketService.emitExpenseUpdate(createExpense); // 🔄 emitimos a clientes
+@AutoTouchVersion('cashRegisters')
+@Mutation(() => Expense, { name: "createExpense" })
+async createInput(@Args('createExpense') createExpense: CreateExpenseInput) {
+  const created = await this._expense.create(createExpense); // ✅ Crear en DB
+  this._socketService.emitExpenseUpdate(created);            // ✅ Emitir ya con ID y datos completos
+  return created;                                            // ✅ Retornar al cliente
+}
 
-    return await this._expense.create(createExpense);
-  }
 
   @AutoTouchVersion('expenses')
   @Mutation(() => Expense, { name: "updateExpenseByDS" })
