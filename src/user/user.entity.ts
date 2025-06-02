@@ -56,3 +56,8 @@ export class User {
 cashiers: Cashier[];
 
 }
+
+
+
+
+

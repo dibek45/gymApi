@@ -50,6 +50,12 @@ async createSale(
       cashierId: cashRegister.cashierId,
     });
 
+
+
+
+
+
+
     const saleDetails: SaleDetail[] = [];
 
     for (const item of cart) {
@@ -110,11 +116,15 @@ private async processMembership(
   const daysToAdd = this.getMembershipDays(item.productId);
 
   if (item.idClienteTOMembership) {
-    await this.userService.updateAvailableDays({
-      id: item.idClienteTOMembership,
-      available_days: daysToAdd,
-    });
-    console.log(`✅ updateAvailableDays llamado para userId=${item.idClienteTOMembership} con ${daysToAdd} días.`);
+    if (daysToAdd > 0) {
+      await this.userService.updateAvailableDays({
+        id: item.idClienteTOMembership,
+        available_days: daysToAdd,
+      });
+      console.log(`✅ updateAvailableDays llamado para userId=${item.idClienteTOMembership} con ${daysToAdd} días.`);
+    } else {
+      console.warn(`❌ Días inválidos para el plan con id ${item.productId}. No se actualizó el usuario.`);
+    }
   } else {
     console.warn(`❌ No se encontró 'idClienteTOMembership' en el item.`);
   }
@@ -212,7 +222,8 @@ private async processMembership(
       case 3: return 30; // Plan Mensual
       case 4: return 365;// Plan Anual
       default:
-        console.warn(`⚠️ No se ha definido mapeo de días para el plan con id ${productId}.`);
+default:
+  throw new Error(`❌ No se definieron días para la membresía con id ${productId}`);
         return 0;
     }
   }
