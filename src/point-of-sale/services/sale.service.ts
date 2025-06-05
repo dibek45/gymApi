@@ -79,6 +79,8 @@ async createSale(
       if (nuevoBalance !== currentBalance) {
         cashRegister.currentBalance = nuevoBalance;
         await manager.save(cashRegister);
+            this.gateway.server.to(`gym-${gymId}`).emit('cashRegisterUpdated', cashRegister);
+
       } else {
         console.warn('⚠️ El balance no cambió. Se omite el guardado de caja.');
       }

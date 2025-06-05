@@ -31,6 +31,9 @@ export class SaleResolver {
 const sale = await this.saleService.createSale(gymId, paymentMethod, cart, cashRegisterId);
 
 this.gateway.server.to(`gym-${sale.gym.id}`).emit('saleUpdated', sale);
+  // 🔁 Obtener la caja actualizada y emitirla
+  
+
 
 return sale;
     
