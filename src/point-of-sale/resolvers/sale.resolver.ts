@@ -3,16 +3,21 @@ import { SaleService } from '../services/sale.service';
 import { Sale } from '../entities/sale.entity';
 import { CartItemInput } from '../dto/cart-item.input';
 import { AutoTouchVersion } from 'src/update-version/decorators/auto-touch-version.decorator';
+import { AppGateway } from 'src/app.gateway';
 
 @Resolver(() => Sale)
 export class SaleResolver {
-  constructor(private readonly saleService: SaleService) {}
+  constructor(private readonly saleService: SaleService,
+      private readonly gateway: AppGateway // 👈 agregar esto
+
+  ) {}
 
   @Query(() => [Sale], { name: 'getSales' })
   async getSales(@Args('gymId') gymId: number): Promise<Sale[]> {
     return this.saleService.findAllByGymId(gymId);
   }
 
+  @AutoTouchVersion('sales') // 👈 actualiza también esto si quieres que sea consistente
   @AutoTouchVersion('cashRegisters')
   @Mutation(() => Sale)
   async createSale(
@@ -22,12 +27,15 @@ export class SaleResolver {
     @Args('cashRegisterId', { type: () => Int }) cashRegisterId: number 
   ): Promise<Sale> {
     console.log(`🛠️ Recibiendo en GraphQL -> gymId: ${gymId}, cashRegisterId: ${cashRegisterId}`);
-    return this.saleService.createSale(gymId, paymentMethod, cart, cashRegisterId);
+
+const sale = await this.saleService.createSale(gymId, paymentMethod, cart, cashRegisterId);
+
+this.gateway.server.to(`gym-${sale.gym.id}`).emit('saleUpdated', sale);
+
+return sale;
+    
   }
   
-  
-
-
   // Consulta para obtener el total de ventas
   @Query(() => Number)
   async getTotalSales(): Promise<number> {

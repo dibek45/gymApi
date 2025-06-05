@@ -10,6 +10,7 @@ import { CashRegister } from '../entities/cash-register.entity';
 import { CashMovement } from '../entities/cash-movement.entity';
 import { UserService } from 'src/user/user.service';
 import { PubSubService } from 'src/shared/pub-sub.service';
+import { AppGateway } from 'src/app.gateway';
 
 @Injectable()
 export class SaleService {
@@ -20,6 +21,7 @@ export class SaleService {
     @InjectRepository(Gym) private gymRepository: Repository<Gym>,
     @InjectRepository(CashRegister) private cashRegisterRepository: Repository<CashRegister>,
     @InjectRepository(CashMovement) private cashMovementRepository: Repository<CashMovement>,
+      private readonly gateway: AppGateway,
     private readonly userService: UserService,
   ) {}
 async createSale(
@@ -91,6 +93,7 @@ async createSale(
     if (cart.some(item => item.isMembership)) {
       await this.pubSubService.touchVersion(gymId, 'members');
     }
+this.gateway.emitSaleUpdate(sale);
 
     return sale;
   });

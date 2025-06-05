@@ -121,6 +121,13 @@ emitCashRegisterUpdate(cashRegister: CashRegister) {
   this.server.to(room).emit('cashRegisterUpdated', cashRegister);
 }
 
+
+emitSaleUpdate(sale: any) {
+  const room = `gym-${sale.gymId}`;
+  this.logger.log(`📤 Enviando saleUpdated a sala: ${room}`);
+  this.server.to(room).emit('saleUpdated', sale);
+}
+
   }
   
   

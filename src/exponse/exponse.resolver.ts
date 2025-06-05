@@ -29,7 +29,7 @@ export class ExpenseResolver {
     return found;
   }
 
-  @AutoTouchVersion('expenses')
+@AutoTouchVersion('expenses')
 @AutoTouchVersion('cashRegisters')
 @Mutation(() => Expense, { name: "createExpense" })
 async createInput(@Args('createExpense') createExpense: CreateExpenseInput) {

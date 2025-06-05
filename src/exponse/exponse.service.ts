@@ -14,8 +14,6 @@ export class ExpenseService {
     private readonly expenseRepository: Repository<Expense>,
     private readonly gateway: AppGateway, 
   private readonly cashRegisterService: CashRegisterService, // ✅
-
-
   ) {}
 
   findAll(): Promise<Expense[]> {
