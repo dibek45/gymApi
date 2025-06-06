@@ -20,17 +20,19 @@ export class Checkin {
   @Field()
   checkinDate: string;
 
-  @Column({ type: 'varchar' })
-  @Field()
-  timestamp: string;
+  
 
   @Column({ name: 'created_by', type: 'varchar' })
   @Field()
   createdBy: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  @Field({ nullable: true })
-  createdAt?: string;
+  @Field(() => Date)
+@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+timestamp: Date;
+
+@Field(() => Date)
+@CreateDateColumn({ type: 'timestamp' })
+createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   @Field({ nullable: true })

@@ -15,8 +15,7 @@ export class CheckinService {
   async create(data: CreateCheckinInput): Promise<Checkin> {
     const newCheckin = this.checkinRepository.create({
       ...data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: new Date(),
     });
 
     return await this.checkinRepository.save(newCheckin);
