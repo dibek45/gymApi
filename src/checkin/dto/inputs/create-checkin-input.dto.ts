@@ -11,10 +11,7 @@ export class CreateCheckinInput {
   @IsNumber()
   gymId: number;
 
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  timestamp: string; // ISO string
+
 
   @Field()
   @IsString()
