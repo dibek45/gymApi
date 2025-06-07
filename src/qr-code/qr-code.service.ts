@@ -4,12 +4,18 @@ import { Repository } from 'typeorm';
 import { QRCode } from './qr-code.entity';
 import { User } from '../user/user.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { CheckinService } from 'src/checkin/checkin.service';
+import { AppGateway } from 'src/app.gateway';
+import { CreateCheckinInput } from 'src/checkin/dto/inputs/create-checkin-input.dto';
 
 @Injectable()
 export class QRCodeService {
-  constructor(
+  constructor(    private checkinService: CheckinService,
+
     @InjectRepository(QRCode)
     private qrCodeRepository: Repository<QRCode>,
+    private readonly socketService: AppGateway
+
   ) {}
 
   async generateQRCode(userId: string): Promise<QRCode> {
@@ -25,21 +31,38 @@ export class QRCodeService {
 
     return this.qrCodeRepository.save(qrCode);
   }
-  // Validar un código QR y devolver el usuario asociado
+
+  
   async getUserByQRCode(code: string): Promise<User> {
-    const qrCode = await this.qrCodeRepository.findOne({
-      where: { code },
-      relations: ['user'], // Incluye la relación con el usuario
-    });
+  const qrCode = await this.qrCodeRepository.findOne({
+    where: { code },
+    relations: ['user'],
+  });
 
-    if (!qrCode) {
-      throw new Error('Código QR no válido');
-    }
+  if (!qrCode) throw new Error('Código QR no válido');
+  if (qrCode.expiresAt < new Date()) throw new Error('Código QR expirado');
 
-    if (qrCode.expiresAt < new Date()) {
-      throw new Error('Código QR expirado');
-    }
+  const user = qrCode.user;
+const now = new Date().toISOString();
 
-    return qrCode.user; // Devuelve el usuario asociado
-  }
+  // Solo se mandan los datos mínimos; el servicio asigna fechas internamente
+  const checkinInput: CreateCheckinInput = {
+    memberId: user.id,
+    gymId: user.gymId,
+    createdBy: "",
+      checkinDate: now,
+
+  };
+
+  const createdCheckin = await this.checkinService.create(checkinInput);
+
+  // Emitir por socket
+  this.socketService.emitCheckinUpdate(createdCheckin);
+
+  // Eliminar el QR para que no se reutilice
+  await this.qrCodeRepository.delete({ id: qrCode.id });
+
+  return user;
+}
+
 }
