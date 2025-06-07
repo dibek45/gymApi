@@ -15,7 +15,7 @@ export class QRCodeResolver {
     return this.qrCodeService.generateQRCode(userId);
   }
 
-  // Consulta para obtener un usuario por código QR, con nombre personalizado
+
   @Query(() => User, { name: 'userByQRCode' })
   async getUserByQRCode(
     @Args('code') code: string,
