@@ -13,6 +13,9 @@ import { AppGateway } from 'src/app.gateway';
   ],
   imports: [
     TypeOrmModule.forFeature([Checkin]) // ✅ solo necesitas la entidad Checkin
-  ]
+  ],
+
+    exports: [CheckinService], // 👈 Esto es CRÍTICO
+
 })
 export class CheckinModule {}
