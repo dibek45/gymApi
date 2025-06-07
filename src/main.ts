@@ -26,6 +26,7 @@ async function bootstrap() {
   const whitelist = [
     'https://api.dibeksolutions.com',
     'https://app.dibeksolutions.com',
+    'https://myappgym.dibeksolutions.com',
     'https://localhost',
     'capacitor://localhost',
     'http://localhost:3000',
