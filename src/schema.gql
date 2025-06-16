@@ -1,0 +1,335 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+scalar Upload
+
+type File {
+  url: String!
+}
+
+type Mutation {
+  createProduct(name: String!, available: Boolean!, img: Upload, stock: Float!, price: Float!, categoryId: Int, gymId: Int!, barcode: String): Product!
+}
+
+
+type Admi {
+  id: ID!
+  name: String!
+  actived: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type User {
+  id: ID!
+  name: String!
+  actived: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  huella: String
+  img: String
+  gymId: Int!
+  available_days: Int!
+}
+
+type Plan {
+  id: ID!
+  name: String!
+  actived: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Category {
+  id: Int!
+  name: String!
+  description: String
+  gymId: Int!
+  products: [Product!]
+}
+
+type Product {
+  id: ID!
+  name: String!
+  created_at: String
+  available: Boolean!
+  img: String
+  stock: Int!
+  price: Int!
+  categoryId: Int
+  gymId: Int
+  category: Category!
+  barcode: String
+}
+
+type Cashier {
+  id: Int!
+  name: String!
+  username: String!
+  email: String
+  phone: String
+  gymId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  cashRegisters: [CashRegister!]!
+}
+
+type CashRegister {
+  id: Int!
+  cashierId: Int!
+  openingBalance: Float!
+  currentBalance: Float!
+  movements: [CashMovement!]!
+  status: String!
+  openingTime: DateTime!
+  gym: Gym!
+  gymId: Int!
+  cashier: Cashier!
+}
+
+type CashMovement {
+  id: Int!
+  amount: Float!
+  type: String!
+  concept: String
+  movementDate: DateTime!
+  cashRegister: CashRegister!
+  cashRegisterId: Int!
+  cashier: Cashier!
+  cashierId: Int!
+  saleId: Int
+  gym: Gym
+  gymId: Int
+}
+
+type SaleDetail {
+  id: Int!
+  product: Product!
+  quantity: Int!
+  unitPrice: Float!
+  totalPrice: Float!
+}
+
+type Sale {
+  id: Int!
+  totalAmount: Float!
+  paymentMethod: String!
+  saleDate: DateTime!
+  cashierId: Int
+  cashMovement: CashMovement
+  details: [SaleDetail!]
+  gym: Gym!
+}
+
+type Gym {
+  id: Int!
+  name: String!
+  location: String!
+  cashMovements: [CashMovement!]
+  sales: [Sale!]!
+  cashRegisters: [CashRegister!]!
+}
+
+type Query {
+  getAllCategories(gymId: Float): [Category!]!
+  getCategoryById(id: Float!): Category
+  plans: [Plan!]!
+  plan(id: Int!): Plan!
+  admis: [Admi!]!
+  admi(id: Int!): Admi!
+  usersByGymId(gymId: Float!, userId: Float): [User!]!
+  userTOCheck_gymId_userId(gymId: Float!, userId: Float): User!
+  user(id: Int!): User!
+  userByHuella(huella: String!): User!
+  productsByGymId(gymId: Float!, productId: Float): [Product!]!
+  product(id: Int!): Product!
+  cashiers(gymId: Int!): [Cashier!]!
+  cashier(gymId: Int!): Cashier!
+  getSales(gymId: Float!): [Sale!]!
+  getTotalSales: Float!
+  getTotalCashSales: Float!
+  getTotalCardSales: Float!
+  getMovementsByCashRegister(cashId: Float!): [CashMovement!]!
+  getAllCashRegisters(gymId: Int): [CashRegister!]!
+  getCashRegister(id: Float!): CashRegister!
+}
+
+type Mutation {
+  createCategory(name: String!, description: String!, gymId: Float!): Category!
+  updateCategory(id: Float!, name: String!, description: String!): Category!
+  deleteCategory(id: Float!): Boolean!
+  createPlan(createPlan: CreatePlan!): Plan!
+  updatePlanByDS(updatePlan: UpdatePlan!): Plan!
+  getSatusPlan(id: Int!): Plan!
+  deletePlan(id: Int!): Boolean!
+  createAdmi(createAdmi: CreateAdmi!): Admi!
+  updateAdmi(updateAdmi: UpdateAdmi!): Admi!
+  getSatusAdmi(id: Int!): Admi!
+  deleteAdmi(id: Int!): Boolean!
+  createUser(createUser: CreateUser!): User!
+  updateUserByDS(updateUser: UpdateUser!): User!
+  updateFingerPrintUserByID(updateFingerPrintUserByID: UpdateFingerPrintUserByID!): User!
+  getSatusUser(id: Int!): User!
+  deleteUser(id: Int!): Boolean!
+  createProduct(createProduct: CreateProduct!): Product!
+  updateProductByDS(updateProduct: UpdateProduct!): Product!
+  getStatusProduct(id: Int!): Product!
+  deleteProduct(id: Int!): Boolean!
+  createGym(name: String!, location: String!): Gym!
+  createCashier(createCashierInput: CreateCashierDto!): Cashier!
+  updateCashier(updateCashierInput: UpdateCashierDto!): Cashier!
+  removeCashier(id: Int!): Boolean!
+  createSale(gymId: Float!, paymentMethod: String!, cart: [CartItemInput!]!): Sale!
+  createCashRegister(input: CreateCashRegisterInput!): CashRegister!
+}
+
+input CreatePlan {
+  id: Float!
+  name: String!
+  actived: Boolean!
+}
+
+input UpdatePlan {
+  """Int"""
+  id: Float!
+
+  """Name"""
+  name: String
+
+  """actived"""
+  actived: Boolean
+}
+
+input CreateAdmi {
+  id: Float!
+  name: String!
+  actived: Boolean!
+}
+
+input UpdateAdmi {
+  """Int"""
+  id: Float!
+
+  """Name"""
+  name: String
+
+  """actived"""
+  actived: Boolean
+}
+
+input CreateUser {
+  name: String!
+  actived: Boolean!
+  huella: String!
+  img: String!
+  gymId: Float!
+  available_days: Float!
+}
+
+input UpdateUser {
+  """Int"""
+  id: Float!
+
+  """Name"""
+  name: String
+
+  """actived"""
+  actived: Boolean
+
+  """img"""
+  img: String
+
+  """Int"""
+  gym_id: Float
+
+  """Int"""
+  available_days: Float
+}
+
+input UpdateFingerPrintUserByID {
+  """Int"""
+  id: Float!
+
+  """huella"""
+  huella: String
+}
+
+input CreateProduct {
+  name: String!
+  available: Boolean!
+  img: String
+  stock: Float!
+  price: Float!
+  categoria_id: Float
+  gymId: Float!
+  barcode: String
+}
+
+input UpdateProduct {
+  """Int"""
+  id: Float!
+
+  """Name"""
+  name: String
+
+  """Available"""
+  available: Boolean
+
+  """img"""
+  img: String
+
+  """Stock"""
+  stock: Float
+
+  """Price"""
+  price: Float
+
+  """categoryId"""
+  categoryId: Float
+
+  """gymId"""
+  gymId: Float
+  barcode: String
+}
+
+input CreateCashierDto {
+  name: String!
+  username: String!
+  password: String!
+  email: String
+  phone: String
+  gymId: Int!
+}
+
+input UpdateCashierDto {
+  name: String
+  username: String
+  password: String
+  email: String
+  phone: String
+  gymId: Int
+  id: Int!
+}
+
+input CartItemInput {
+  productId: Int!
+  quantity: Int!
+  name: String!
+  costo: Int!
+}
+
+input CreateCashRegisterInput {
+  cashierId: Float!
+  openingBalance: Float!
+  gymId: Float!
+}
+
+type Subscription {
+  newUser: User!
+  newProduct: Product!
+}

@@ -1,0 +1,33 @@
+# Dependencias de Node
+node_modules
+
+# Builds (si compilas a dist u otra carpeta)
+dist
+
+# Archivos de entorno (variables sensibles)
+.env
+.env.*
+
+# Archivos de logs
+*.log
+
+# Carpetas generadas por Docker, si almacenan datos persistentes
+pgdata
+uploads
+
+# Archivos de mapeo de TypeScript
+*.js.map
+
+# Configuraciones locales de IDE/Editor
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Sistema Mac
+.DS_Store
+
+# Node REPL History
+.node_repl_history
