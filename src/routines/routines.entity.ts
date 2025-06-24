@@ -7,14 +7,14 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { ExerciseType } from './exercise-type.entity';
 
 @ObjectType()
 @Entity()
 export class Routine {
   @PrimaryGeneratedColumn()
-  @Field()
+  @Field(() => Int)
   id: number;
 
   @Column({ length: 50 })
@@ -37,16 +37,19 @@ export class Routine {
   @Field()
   count: number;
 
- 
-  // Relación con ExerciseType
   @ManyToOne(() => ExerciseType, (exerciseType) => exerciseType.routines, { eager: true })
   @JoinColumn({ name: 'exerciseTypeId' })
   @Field(() => ExerciseType)
   exerciseType: ExerciseType;
 
   @Column()
-  @Field()
-  exerciseTypeId: number; // Identificador del tipo de ejercicio
+  @Field(() => Int)
+  exerciseTypeId: number;
+
+  // 👇 Campo opcional para sincronización por gimnasio
+  @Column({ type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
+  gymId?: number;
 
   @CreateDateColumn()
   @Field()

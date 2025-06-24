@@ -12,6 +12,9 @@ import {
 import { CashRegister } from './point-of-sale/entities/cash-register.entity';
 import { Product } from './product/product.entity';
 import { Cashier } from './point-of-sale/cashiers/entities/cashier.entity';
+import { Machine } from './machine/entities/machine.entity';
+import { Promotion } from './promotions/promotion.entity';
+import { Routine } from './routines/routines.entity';
   
   @WebSocketGateway({ cors: { origin: '*' } })
   export class AppGateway implements OnGatewayConnection {
@@ -126,6 +129,16 @@ emitSaleUpdate(sale: any) {
   const room = `gym-${sale.gymId}`;
   this.logger.log(`📤 Enviando saleUpdated a sala: ${room}`);
   this.server.to(room).emit('saleUpdated', sale);
+}
+emitMachineUpdate(machine: Machine) {
+  this.server.to(`gym-${machine.gymId}`).emit('machineUpdated', machine);
+}
+
+emitPromotionUpdate(promotion: Promotion) {
+  this.server.to(`gym-${promotion.gymId}`).emit('promotionUpdated', promotion);
+}
+emitRoutineUpdate(routine: Routine) {
+  this.server.to(`gym-${routine.gymId}`).emit('routineUpdated', routine);
 }
 
   }

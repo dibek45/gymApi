@@ -37,4 +37,9 @@ export class CreateRoutine {
   @IsNumber()
   @IsNotEmpty()
   exerciseTypeId: number; // Relación obligatoria con el tipo de ejercicio
+
+   @Field(() => Int)
+  @IsNumber()
+  @IsNotEmpty()
+  gymId: number;
 }

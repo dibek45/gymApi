@@ -9,7 +9,7 @@ import { AppGateway } from 'src/app.gateway';
   providers: [
     CheckinResolver,
     CheckinService,
-    AppGateway // ✅ WebSocket para emitir eventos
+    AppGateway 
   ],
   imports: [
     TypeOrmModule.forFeature([Checkin]) // ✅ solo necesitas la entidad Checkin
