@@ -156,7 +156,7 @@ services:
     container_name: admin-rfs
     restart: always
     volumes:
-        - ../adsrf/dist/adsrf:/usr/share/nginx/html
+        - ./adsrf/dist/adsrf:/usr/share/nginx/html
       # Si tienes nginx.conf personalizado, descomenta la línea:
       # - ../rfs/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
