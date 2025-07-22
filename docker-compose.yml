@@ -178,7 +178,7 @@ services:
 
   backend-rifas:
     build:
-      context: ./backend-rifas
+      context: ../backend-rifas
       dockerfile: Dockerfile
     container_name: backend-rifas
     ports:
