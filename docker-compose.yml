@@ -180,7 +180,8 @@ services:
       context: ./backend-rifas
       dockerfile: Dockerfile
     container_name: backend-rifas
-
+    ports:
+      - "3010:3000"
 networks:
   shared-network:
     driver: bridge
