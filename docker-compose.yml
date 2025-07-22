@@ -1,4 +1,3 @@
-
 version: "3.8"
 
 services:
@@ -37,7 +36,7 @@ services:
       - AUTH_MEMBER_HOST=authmember2
       - AUTH_MEMBER_PORT=4002
     ports:
-      - "3000:3000"  # 👈 Puerto 3100 en tu máquina, 3000 dentro del contenedor
+      - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
@@ -115,6 +114,7 @@ services:
         condition: service_healthy
     networks:
       - shared-network
+
   rfs:
     image: nginx:alpine
     container_name: angular-rfs
@@ -125,6 +125,7 @@ services:
       - "8081:80"
     networks:
       - rifa-network
+
   caddy:
     image: caddy:alpine
     container_name: caddy
@@ -140,6 +141,7 @@ services:
       - app
     networks:
       - shared-network
+
   frontend:
     image: nginx:alpine
     container_name: angular-frontend
@@ -164,7 +166,6 @@ services:
     networks:
       - rifa-network
 
-
   memberapp:
     image: nginx:alpine
     container_name: angular-member
@@ -177,8 +178,8 @@ services:
 
   backend-rifas:
     build:
-    context: ./backend-rifas
-    dockerfile: Dockerfile
+      context: ./backend-rifas
+      dockerfile: Dockerfile
     container_name: backend-rifas
     ports:
       - "3010:3000"
@@ -192,9 +193,8 @@ services:
       db:
         condition: service_healthy
 
-  networks:
-    - rifa-network
-  depends_on:
-    db:
-      condition: service_healthy
-
+networks:
+  shared-network:
+    driver: bridge
+  rifa-network:
+    driver: bridge
