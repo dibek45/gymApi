@@ -175,16 +175,20 @@ services:
     networks:
       - shared-network
 
-  backend-rifas:
-    build:
-      context: ./backend-rifas
-      dockerfile: Dockerfile
-    container_name: backend-rifas
-    ports:
-      - "3010:3000"
-networks:
-  shared-network:
-    driver: bridge
-    
-  rifa-network:
-    driver: bridge
+    backend-rifas:
+      build:
+        context: ./backend-rifas
+        dockerfile: Dockerfile
+      container_name: backend-rifas
+      ports:
+        - "3010:3000"
+      restart: always
+      environment:
+        - PORT=3000
+        - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+  networks:
+    - rifa-network
+  depends_on:
+    db:
+      condition: service_healthy
+
