@@ -175,7 +175,7 @@ services:
     networks:
       - shared-network
 
-    backend-rifas:
+  backend-rifas:
       build:
         context: ./backend-rifas
         dockerfile: Dockerfile
