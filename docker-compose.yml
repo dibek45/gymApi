@@ -175,7 +175,7 @@ services:
     networks:
       - shared-network
 
-  backend-rifas:
+    backend-rifas:
       build:
         context: ./backend-rifas
         dockerfile: Dockerfile
@@ -186,6 +186,12 @@ services:
       environment:
         - PORT=3000
         - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      networks:
+        - rifa-network
+      depends_on:
+        db:
+          condition: service_healthy
+
   networks:
     - rifa-network
   depends_on:
