@@ -148,7 +148,7 @@ services:
     networks:
       - shared-network
 
-   backend-rifas:
+  backend-rifas:
     build:
       context: ../backend-rifas  # 👈 CAMBIA esto al folder real del backend
       dockerfile: Dockerfile
