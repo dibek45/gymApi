@@ -21,34 +21,7 @@ services:
       retries: 5
       timeout: 5s
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: nest-docker-postgres
-    restart: always
-    environment:
-      - PORT=3000
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
-      - AUTH_SERVICE_HOST=auth-service2 
-      - AUTH_SERVICE_PORT=4001
-      - AUTH_MEMBER_HOST=authmember2
-      - AUTH_MEMBER_PORT=4002
-    ports:
-      - "3000:3000"
-    depends_on:
-      db:
-        condition: service_healthy
-      auth-service2:
-        condition: service_healthy
-      authmember2:
-        condition: service_healthy
-    networks:
-      - shared-network
-    volumes:
-      - ./src:/app/src
-      - ./uploads:/app/uploads
-      - ./node_modules:/app/node_modules
+  
 
   auth-service2:
     build:
@@ -175,9 +148,9 @@ services:
     networks:
       - shared-network
 
-  backend-rifas:
+   backend-rifas:
     build:
-      context: .
+      context: ../backend-rifas  # 👈 CAMBIA esto al folder real del backend
       dockerfile: Dockerfile
     container_name: backend-rifas
     ports:
@@ -185,12 +158,41 @@ services:
     restart: always
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/rifas
     networks:
       - shared-network
     depends_on:
       db:
         condition: service_healthy
+
+  app:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: nest-docker-postgres
+      restart: always
+      environment:
+        - PORT=3000
+        - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+        - AUTH_SERVICE_HOST=auth-service2 
+        - AUTH_SERVICE_PORT=4001
+        - AUTH_MEMBER_HOST=authmember2
+        - AUTH_MEMBER_PORT=4002
+      ports:
+        - "3000:3000"
+      depends_on:
+        db:
+          condition: service_healthy
+        auth-service2:
+          condition: service_healthy
+        authmember2:
+          condition: service_healthy
+      networks:
+        - shared-network
+      volumes:
+        - ./src:/app/src
+        - ./uploads:/app/uploads
+        - ./node_modules:/app/node_modules
 
 networks:
   shared-network:
