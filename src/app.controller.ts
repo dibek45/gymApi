@@ -10,7 +10,7 @@ export class AppController {
 
   @Get('/health')
 getHealth() {
-  return 'ok';
+  return 'ok desde api gym';
 }
 
   @Get('huella')
