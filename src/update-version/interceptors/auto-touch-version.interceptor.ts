@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable, tap } from 'rxjs';
 import { AUTO_TOUCH_VERSION_KEY } from '../decorators/auto-touch-version.decorator';
 import { UpdateVersionService } from '../update-version.service';
+import { ContextType } from '@nestjs/common';
 
 @Injectable()
 export class AutoTouchVersionGraphQLInterceptor implements NestInterceptor {
@@ -18,6 +19,12 @@ export class AutoTouchVersionGraphQLInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+
+
+if (context.getType<string>() !== 'graphql') {
+  return next.handle();
+}
+
     const gqlCtx = GqlExecutionContext.create(context);
     const table = this.reflector.get<string>(
       AUTO_TOUCH_VERSION_KEY,

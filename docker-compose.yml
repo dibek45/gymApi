@@ -15,7 +15,6 @@ services:
       - "5432:5432"
     networks:
       - shared-network
-      - rifa-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
@@ -124,7 +123,7 @@ services:
     ports:
       - "8081:80"
     networks:
-      - rifa-network
+      - shared-network
 
   caddy:
     image: caddy:alpine
@@ -164,7 +163,7 @@ services:
     ports:
       - "8083:80"
     networks:
-      - rifa-network
+      - shared-network
 
   memberapp:
     image: nginx:alpine
@@ -188,7 +187,7 @@ services:
       - PORT=3000
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     networks:
-      - rifa-network
+      - shared-network
     depends_on:
       db:
         condition: service_healthy
@@ -196,5 +195,4 @@ services:
 networks:
   shared-network:
     driver: bridge
-  rifa-network:
-    driver: bridge
+ 
