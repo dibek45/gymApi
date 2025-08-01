@@ -81,10 +81,21 @@ services:
       - PGADMIN_DEFAULT_EMAIL=david-6393@hotmail.com
       - PGADMIN_DEFAULT_PASSWORD=Dandroid*1
     ports:
-      - "5051:80"
+      - "5050:80"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - shared-network
+
+  rfs:
+    image: nginx:alpine
+    container_name: angular-rfs
+    restart: always
+    volumes:
+      - ../rfs/dist/mi-proyecto-angular/browser:/usr/share/nginx/html
+    ports:
+      - "8081:80"
     networks:
       - shared-network
 
@@ -93,8 +104,8 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "8088:80"
-      - "8443:443"
+      - "80:80"
+      - "443:443"
     volumes:
       - ../caddy/Caddyfile:/etc/caddy/Caddyfile
       - ../caddy/data:/data
@@ -116,6 +127,17 @@ services:
     networks:
       - shared-network
 
+  admin-rfs:
+    image: nginx:alpine
+    container_name: admin-rfs
+    restart: always
+    volumes:
+      - /home/dibek/Proyectos/adsrf/dist/adsrf/browser:/usr/share/nginx/html
+      - /home/dibek/Proyectos/adsrf/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8083:80"
+    networks:
+      - shared-network
 
   memberapp:
     image: nginx:alpine
@@ -126,6 +148,25 @@ services:
       - ../mmbro/nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - shared-network
+
+  backend-rifas:
+    build:
+      context: ../backend-rifas  # 👈 CAMBIA esto al folder real del backend
+      dockerfile: Dockerfile
+    container_name: backend-rifas
+    ports:
+      - "3010:3000"
+    volumes:
+    - ../backend-rifas/uploads:/app/uploads
+    restart: always
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/rifas
+    networks:
+      - shared-network
+    depends_on:
+      db:
+        condition: service_healthy
 
   app:
       build:
