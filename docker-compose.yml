@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
-    volumes:
+    volumes:  
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -154,4 +154,4 @@ services:
 
 networks:
   shared-network:
-    driver: bridge
+    external: true
