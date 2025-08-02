@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # Base de datos PostgreSQL
   db:
     image: postgres:16
     restart: always
@@ -9,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
-    volumes:  
+    volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -21,6 +22,7 @@ services:
       retries: 5
       timeout: 5s
 
+  # pgAdmin para administración
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -36,6 +38,7 @@ services:
     networks:
       - shared-network
 
+  # Microservicio auth-service2
   auth-service2:
     build:
       context: ../auth-service2
@@ -59,6 +62,7 @@ services:
       timeout: 10s
       start_period: 60s
 
+  # Microservicio authmember2
   authmember2:
     build:
       context: ../authmember2
@@ -85,36 +89,72 @@ services:
       timeout: 10s
       start_period: 60s
 
-  app:
+  # Backend Rifas
+  backend-rifas:
     build:
-      context: .
+      context: ../backend-rifas
       dockerfile: Dockerfile
-    container_name: nest-docker-postgres
+    container_name: backend-rifas
     restart: always
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
-      - AUTH_SERVICE_HOST=auth-service2 
-      - AUTH_SERVICE_PORT=4001
-      - AUTH_MEMBER_HOST=authmember2
-      - AUTH_MEMBER_PORT=4002
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-rifas:5432/rifas
+    volumes:
+      - ../backend-rifas/uploads:/app/uploads
+      - ../backend-rifas:/app
     ports:
-      - "3000:3000"
+      - "3010:3000"
     depends_on:
       db:
         condition: service_healthy
-      auth-service2:
-        condition: service_healthy
-      authmember2:
-        condition: service_healthy
     networks:
       - shared-network
-    volumes:
-      - ./src:/app/src
-      - ./uploads:/app/uploads
-      - ./node_modules:/app/node_modules
 
-  frontend:
+  # Admin Rifas - nginx
+  admin-rfs:
+    image: nginx:alpine
+    container_name: admin-rfs
+    restart: always
+    volumes:
+      - /home/dibek/Proyectos/adsrf/dist/adsrf/browser:/usr/share/nginx/html
+      - /home/dibek/Proyectos/adsrf/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8083:80"
+    networks:
+      - shared-network
+
+  # Angular Rifas - nginx
+  angular-rfs:
+    image: nginx:alpine
+    container_name: angular-rfs
+    restart: always
+    volumes:
+      - ../rfs/dist/mi-proyecto-angular/browser:/usr/share/nginx/html
+    ports:
+      - "8081:80"
+    networks:
+      - shared-network
+
+  # Auth microservice (otro)
+  auth-r:
+    hostname: auth-r
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-r
+    restart: always
+    ports:
+      - "4003:4003"
+    environment:
+      - PORT=4003
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-rifas:5432/rifas
+    networks:
+      - shared-network
+    depends_on:
+      - db
+
+  # Angular Frontend principal
+  angular-frontend:
     image: nginx:alpine
     container_name: angular-frontend
     restart: always
@@ -126,7 +166,8 @@ services:
     networks:
       - shared-network
 
-  memberapp:
+  # Angular app Miembros
+  angular-member:
     image: nginx:alpine
     container_name: angular-member
     restart: always
@@ -136,6 +177,7 @@ services:
     networks:
       - shared-network
 
+  # Caddy para TLS y proxy inverso global
   caddy:
     image: caddy:alpine
     container_name: caddy
@@ -148,7 +190,7 @@ services:
       - ../caddy/data:/data
       - ../caddy/config:/config
     depends_on:
-      - app
+      - backend-rifas
     networks:
       - shared-network
 
