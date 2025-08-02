@@ -160,7 +160,7 @@ services:
       volumes:
         - ../rfs/dist/mi-proyecto-angular/browser:/usr/share/nginx/html
       ports:
-        - "8081:80"
+        - "8087:80"
       networks:
         - shared-network  # 👈 CAMBIADO
 
