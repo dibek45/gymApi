@@ -185,7 +185,8 @@ services:
     restart: always
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://postgres:postgres@postgres-rifas:5432/rifas
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+
     volumes:
       - ../backend-rifas/uploads:/app/uploads
       - ../backend-rifas:/app
