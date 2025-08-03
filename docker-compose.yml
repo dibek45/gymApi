@@ -213,7 +213,7 @@ services:
     networks:
       - shared-network
     volumes:
-      - ../auth-r/src:/app/src
+      - ../authr/src:/app/src  # ✅ solo esto
     depends_on:
       db:
         condition: service_healthy
