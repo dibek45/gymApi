@@ -20,7 +20,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
-    
   },
   "dependencies": {
     "@apollo/server": "^4.12.0",
@@ -47,7 +46,7 @@
     "ngx-cookie-service": "^18.0.0",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "ws": "^8.18.2"
