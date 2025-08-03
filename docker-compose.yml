@@ -112,7 +112,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./uploads:/app/uploads
-      - ./node_modules:/app/node_modules
+      # ❌ NO MONTES node_modules desde afuera
 
   frontend:
     image: nginx:alpine
