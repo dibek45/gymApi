@@ -201,7 +201,7 @@ services:
 
   auth-r:
     build:
-      context: ../auth-r
+      context: ../authr  
       dockerfile: Dockerfile
     container_name: auth-r
     restart: always
