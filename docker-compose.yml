@@ -1,4 +1,4 @@
-version: "3.8"
+
 
 services:
   db:
@@ -207,7 +207,6 @@ services:
     restart: always
     environment:
       - PORT=4003
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     ports:
       - "4003:4003"
     networks:
