@@ -196,9 +196,18 @@ services:
     networks:
       - shared-network  # 👈 CAMBIADO
 
-
-
-
+ 
+  agenda:
+    image: nginx:alpine
+    container_name: agenda
+    restart: always
+    volumes:
+      - ../ag/dist/agenda/browser:/usr/share/nginx/html:ro
+      - ../ag/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    expose:
+      - "80"
+    networks:
+      - shared-network
   auth-r:
     build:
       context: ../authr  
@@ -223,17 +232,7 @@ services:
       timeout: 10s
       start_period: 60s
 
-agenda:
-  image: nginx:alpine
-  container_name: agenda
-  restart: always
-  volumes:
-    - ../ag/dist/agenda/browser:/usr/share/nginx/html:ro
-    - ../ag/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-  expose:
-    - "80"
-  networks:
-    - shared-network
+
 
 networks:
   shared-network:
