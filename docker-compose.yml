@@ -223,6 +223,18 @@ services:
       timeout: 10s
       start_period: 60s
 
+  agenda:
+    image: nginx:alpine
+    container_name: agenda
+    restart: always
+    volumes:
+      - ../ag/dist/agenda/browser:/usr/share/nginx/html   # 👈 ajusta al path de tu build Angular
+      - ../ag/nginx.conf:/etc/nginx/conf.d/default.conf   # 👈 si quieres un config custom
+    ports:
+      - "8088:80"  # 👈 puerto único para agenda
+    networks:
+      - shared-network
+
 networks:
   shared-network:
     driver: bridge  
